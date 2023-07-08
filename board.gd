@@ -10,9 +10,19 @@ const GRID_BG = "#000000"
 const GRID_COLOUR = "#FFFFFF"
 
 #var shape_l = preload("res://shape_l.gd")
+var shape_i
+var shape_j
 var shape_l
+var shape_o
+var shape_s
+var shape_t
+var shape_z
 #var shape = shape_l.new()
 var shape
+
+var shape_array = [
+	
+]
 
 var accel = 2
 var speed = 50
@@ -48,9 +58,8 @@ func _ready():
 #	_set_square(9,19)
 #	_set_square(5,2)
 #	_set_square(1,2)
-	shape_l = preload("res://shape_l.gd")
-	shape = shape_l.new()
-	_place_shape(shape)
+#	_spawn_shape(randi() % 7)
+	_spawn_shape(1)
 	
 #	_print_board()
 	
@@ -58,29 +67,30 @@ func _ready():
 	
 func _input(event):
 	if event is InputEventKey and event.pressed:
-		if event.keycode == KEY_LEFT:
-			shape.my_shape = shape.rotate(1)
-		if event.keycode == KEY_RIGHT:
-			shape.my_shape = shape.rotate(-1)
+		if event.keycode == KEY_SPACE:
+			shape.rotate(1)
+		if event.keycode == KEY_ALT:
+			shape.rotate(-1)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	time += speed * delta
-	if time > 10:
-		time = 0
-		shape.drop()
+	if is_instance_valid(shape):  # check the shape has not been destroyed
+		time += speed * delta
+		if time > 10:
+			time = 0
+			shape.drop()
+			_clear_board()
+			_place_shape(shape, shape.is_set)
+			_render_board()
+			queue_redraw()
+			return
 		_clear_board()
-		_place_shape(shape)
-#		_print_board()
+		_place_shape(shape, shape.is_set)
 		_render_board()
 		queue_redraw()
-		return
-	_clear_board()
-	_place_shape(shape)
-#	_print_board()
-	_render_board()
-	queue_redraw()
-#	print(shape.position)
+	else:
+#		_spawn_shape(randi() % 7)
+		_spawn_shape(1)
 
 
 	
@@ -116,7 +126,7 @@ func _set_square(x , y):
 func _render_board():
 	for i in ROWS:
 		for j in COLUMNS:
-			if board[i][j] == 1:
+			if board[i][j] != 0:
 				_fill_square(j,i)
 	queue_redraw()
 
@@ -124,30 +134,66 @@ func _render_board():
 func _clear_board():
 	for i in ROWS:
 		for j in COLUMNS:
-			board[i][j] = 0	
+			if board[i][j] == 2:
+				pass
+			else:
+				board[i][j] = 0
 
-func _spawn_shape():
-	pass
+func _spawn_shape(num):
+	match (num):
+		0:
+			shape_i = preload("res://shape_i.gd")
+			shape = shape_i.new()
+			shape.shape_is_set.connect(_on_shape_shape_is_set)
+		1:
+			shape_j = preload("res://shape_j.gd")
+			shape = shape_j.new()
+			shape.shape_is_set.connect(_on_shape_shape_is_set)
+
+		2:
+			shape_l = preload("res://shape_l.gd")
+			shape = shape_l.new()
+			shape.shape_is_set.connect(_on_shape_shape_is_set)
+
+		3:
+			shape_o = preload("res://shape_o.gd")
+			shape = shape_o.new()
+			shape.shape_is_set.connect(_on_shape_shape_is_set)
+
+		4:
+			shape_s = preload("res://shape_s.gd")
+			shape = shape_s.new()
+			shape.shape_is_set.connect(_on_shape_shape_is_set)
+
+		5:
+			shape_t = preload("res://shape_t.gd")
+			shape = shape_t.new()
+			shape.shape_is_set.connect(_on_shape_shape_is_set)
+
+		6:
+			shape_z = preload("res://shape_z.gd")
+			shape = shape_z.new()
+			shape.shape_is_set.connect(_on_shape_shape_is_set)
+			
+	_place_shape(shape, 1)
 	
-func _place_shape(shape):
+func _place_shape(shape, value):
 	var start_x = shape.position.x
 	var start_y = shape.position.y
-	var num_cols = len(shape.my_shape[0])
-	var num_rows = len(shape.my_shape)
-#	print("startx: " + str(start_x) + " startY: " + str(start_y) + " num_cols: " + str(num_cols) + " num_rows: " + str(num_rows))
+	var num_cols = len(shape.cells[shape.cell_index][0])
+	var num_rows = len(shape.cells[shape.cell_index])
 	for i in range(start_y, start_y + num_rows):
 		for j in range(start_x, start_x + num_cols):
-#			print("board Y: " + str(i))
-#			print("board X: " + str(j))
-#			print("Shape: " + str(shape.my_shape[i - start_y][j -start_x]))
-			board[i][j] = shape.my_shape[i - start_y][j -start_x]
+			if value == 2:
+				if shape.cells[shape.cell_index][i - start_y][j -start_x] == 1:
+					board[i][j] = 2
+				else: 
+					board[i][j] = 0
+			else:
+				board[i][j] = shape.cells[shape.cell_index][i - start_y][j - start_x]
 
-func get_rows():
-	return ROWS
 
-# TODO
-# render shape
-# 2d array for board
-# drop shape
-# rotate shape
-# collision detection
+
+func _on_shape_shape_is_set():
+	_place_shape(shape, 2)
+	_print_board()

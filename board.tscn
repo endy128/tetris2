@@ -1,19 +1,52 @@
-[gd_scene load_steps=4 format=3 uid="uid://cjs2ouveo4emu"]
+[gd_scene load_steps=10 format=3 uid="uid://cjs2ouveo4emu"]
 
 [ext_resource type="Script" path="res://board.gd" id="1_qqn35"]
+[ext_resource type="Script" path="res://shape_o.gd" id="2_adk8f"]
 [ext_resource type="Script" path="res://shape.gd" id="2_d2v0r"]
+[ext_resource type="Script" path="res://shape_j.gd" id="2_e284f"]
 [ext_resource type="Script" path="res://shape_l.gd" id="3_01kim"]
+[ext_resource type="Script" path="res://shape_s.gd" id="5_0jwwr"]
+[ext_resource type="Script" path="res://shape_z.gd" id="6_3oxne"]
+[ext_resource type="Script" path="res://shape_i.gd" id="7_thnun"]
+[ext_resource type="Script" path="res://shape_t.gd" id="8_gh33y"]
 
 [node name="main" type="Node2D"]
 
 [node name="shape" type="Node2D" parent="."]
 script = ExtResource("2_d2v0r")
 
+[node name="shape_o" type="Node2D" parent="shape"]
+script = ExtResource("2_adk8f")
+
+[node name="shape_j" type="Node2D" parent="shape"]
+script = ExtResource("2_e284f")
+
 [node name="shape_l" type="Node2D" parent="shape"]
 script = ExtResource("3_01kim")
+
+[node name="shape_s" type="Node2D" parent="shape"]
+script = ExtResource("5_0jwwr")
+
+[node name="shape_z" type="Node2D" parent="shape"]
+script = ExtResource("6_3oxne")
+
+[node name="shape_i" type="Node2D" parent="shape"]
+script = ExtResource("7_thnun")
+
+[node name="shape_t" type="Node2D" parent="shape"]
+script = ExtResource("8_gh33y")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(206, 457)
 
 [node name="board" type="Node2D" parent="."]
 script = ExtResource("1_qqn35")
+
+[connection signal="shape_is_set" from="shape" to="board" method="_on_shape_shape_is_set"]
+[connection signal="shape_is_set" from="shape/shape_o" to="board" method="_on_shape_shape_is_set"]
+[connection signal="shape_is_set" from="shape/shape_j" to="board" method="_on_shape_shape_is_set"]
+[connection signal="shape_is_set" from="shape/shape_l" to="board" method="_on_shape_shape_is_set"]
+[connection signal="shape_is_set" from="shape/shape_s" to="board" method="_on_shape_shape_is_set"]
+[connection signal="shape_is_set" from="shape/shape_z" to="board" method="_on_shape_shape_is_set"]
+[connection signal="shape_is_set" from="shape/shape_i" to="board" method="_on_shape_shape_is_set"]
+[connection signal="shape_is_set" from="shape/shape_t" to="board" method="_on_shape_shape_is_set"]
