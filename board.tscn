@@ -1,0 +1,19 @@
+[gd_scene load_steps=4 format=3 uid="uid://cjs2ouveo4emu"]
+
+[ext_resource type="Script" path="res://board.gd" id="1_qqn35"]
+[ext_resource type="Script" path="res://shape.gd" id="2_d2v0r"]
+[ext_resource type="Script" path="res://shape_l.gd" id="3_01kim"]
+
+[node name="main" type="Node2D"]
+
+[node name="shape" type="Node2D" parent="."]
+script = ExtResource("2_d2v0r")
+
+[node name="shape_l" type="Node2D" parent="shape"]
+script = ExtResource("3_01kim")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(206, 457)
+
+[node name="board" type="Node2D" parent="."]
+script = ExtResource("1_qqn35")
