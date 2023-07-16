@@ -1,11 +1,10 @@
 extends Shape
 
-var my_shape = [
+var frame_1 = [
 	[1,1],
 	[1,1],
 ]
 
-var my_shape_blank = [
-	[0,0],
-	[0,0]
-]
+var frames = [frame_1]
+var frame_index = 0
+

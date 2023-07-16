@@ -9,7 +9,6 @@ const START_Y = 130
 const GRID_BG = "#000000"
 const GRID_COLOUR = "#FFFFFF"
 
-#var shape_l = preload("res://shape_l.gd")
 var shape_i
 var shape_j
 var shape_l
@@ -17,7 +16,6 @@ var shape_o
 var shape_s
 var shape_t
 var shape_z
-#var shape = shape_l.new()
 var shape
 
 var shape_array = [
@@ -53,24 +51,19 @@ var board = [
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-#	_set_square(0,0)
-#	_set_square(2,5)
-#	_set_square(9,19)
-#	_set_square(5,2)
-#	_set_square(1,2)
-#	_spawn_shape(randi() % 7)
-	_spawn_shape(1)
-	
-#	_print_board()
-	
+	_spawn_shape(randi() % 7)
 
-	
+
 func _input(event):
 	if event is InputEventKey and event.pressed:
-		if event.keycode == KEY_SPACE:
+		if event.keycode == KEY_SPACE or event.keycode == KEY_UP:
 			shape.rotate(1)
 		if event.keycode == KEY_ALT:
 			shape.rotate(-1)
+		if event.keycode == KEY_RIGHT:
+			shape.move(1)
+		if event.keycode == KEY_LEFT:
+			shape.move(-1)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
@@ -89,8 +82,8 @@ func _process(delta):
 		_render_board()
 		queue_redraw()
 	else:
-#		_spawn_shape(randi() % 7)
-		_spawn_shape(1)
+		_spawn_shape(randi() % 7)
+#		_spawn_shape(1)
 
 
 	
@@ -180,17 +173,17 @@ func _spawn_shape(num):
 func _place_shape(shape, value):
 	var start_x = shape.position.x
 	var start_y = shape.position.y
-	var num_cols = len(shape.cells[shape.cell_index][0])
-	var num_rows = len(shape.cells[shape.cell_index])
+	var num_cols = len(shape.frames[shape.frame_index][0])
+	var num_rows = len(shape.frames[shape.frame_index])
 	for i in range(start_y, start_y + num_rows):
 		for j in range(start_x, start_x + num_cols):
 			if value == 2:
-				if shape.cells[shape.cell_index][i - start_y][j -start_x] == 1:
+				if shape.frames[shape.frame_index][i - start_y][j - start_x] == 1:
 					board[i][j] = 2
 				else: 
 					board[i][j] = 0
 			else:
-				board[i][j] = shape.cells[shape.cell_index][i - start_y][j - start_x]
+				board[i][j] = shape.frames[shape.frame_index][i - start_y][j - start_x]
 
 
 
