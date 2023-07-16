@@ -41,12 +41,3 @@ position = Vector2(206, 457)
 
 [node name="board" type="Node2D" parent="."]
 script = ExtResource("1_qqn35")
-
-[connection signal="shape_is_set" from="shape" to="board" method="_on_shape_shape_is_set"]
-[connection signal="shape_is_set" from="shape/shape_o" to="board" method="_on_shape_shape_is_set"]
-[connection signal="shape_is_set" from="shape/shape_j" to="board" method="_on_shape_shape_is_set"]
-[connection signal="shape_is_set" from="shape/shape_l" to="board" method="_on_shape_shape_is_set"]
-[connection signal="shape_is_set" from="shape/shape_s" to="board" method="_on_shape_shape_is_set"]
-[connection signal="shape_is_set" from="shape/shape_z" to="board" method="_on_shape_shape_is_set"]
-[connection signal="shape_is_set" from="shape/shape_i" to="board" method="_on_shape_shape_is_set"]
-[connection signal="shape_is_set" from="shape/shape_t" to="board" method="_on_shape_shape_is_set"]
