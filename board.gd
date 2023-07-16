@@ -64,6 +64,10 @@ func _input(event):
 			shape.move(1)
 		if event.keycode == KEY_LEFT:
 			shape.move(-1)
+		if event.keycode == KEY_DOWN:
+			time = 50
+		if event.is_action_released("down"):
+			time = 0
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
@@ -97,7 +101,6 @@ func _draw():
 	for i in range(START_Y, BLOCK_SIZE * ROWS + START_Y + 1, BLOCK_SIZE):
 		draw_line(Vector2(START_X, i), Vector2(COLUMNS * BLOCK_SIZE + START_X, i ), GRID_COLOUR, GRID_WIDTH)
 	
-#	_place_shape(shape)
 	_render_board()
 
 
@@ -138,54 +141,77 @@ func _spawn_shape(num):
 			shape_i = preload("res://shape_i.gd")
 			shape = shape_i.new()
 			shape.shape_is_set.connect(_on_shape_shape_is_set)
+			shape.board = board
 		1:
 			shape_j = preload("res://shape_j.gd")
 			shape = shape_j.new()
 			shape.shape_is_set.connect(_on_shape_shape_is_set)
+			shape.board = board
+			
 
 		2:
 			shape_l = preload("res://shape_l.gd")
 			shape = shape_l.new()
 			shape.shape_is_set.connect(_on_shape_shape_is_set)
+			shape.board = board
 
 		3:
 			shape_o = preload("res://shape_o.gd")
 			shape = shape_o.new()
 			shape.shape_is_set.connect(_on_shape_shape_is_set)
+			shape.board = board
 
 		4:
 			shape_s = preload("res://shape_s.gd")
 			shape = shape_s.new()
 			shape.shape_is_set.connect(_on_shape_shape_is_set)
+			shape.board = board
 
 		5:
 			shape_t = preload("res://shape_t.gd")
 			shape = shape_t.new()
 			shape.shape_is_set.connect(_on_shape_shape_is_set)
+			shape.board = board
 
 		6:
 			shape_z = preload("res://shape_z.gd")
 			shape = shape_z.new()
 			shape.shape_is_set.connect(_on_shape_shape_is_set)
+			shape.board = board
 			
 	_place_shape(shape, 1)
 	
 func _place_shape(shape, value):
+	shape.coords = []
 	var start_x = shape.position.x
 	var start_y = shape.position.y
 	var num_cols = len(shape.frames[shape.frame_index][0])
 	var num_rows = len(shape.frames[shape.frame_index])
 	for i in range(start_y, start_y + num_rows):
 		for j in range(start_x, start_x + num_cols):
+			# when the last row of the shape is being placed
+			# set the co-ords of the filled squares
+			if i == start_y + num_rows - 1:
+				_set_shape_last_row_coords(shape, i, j, start_y, start_x)
 			if value == 2:
-				if shape.frames[shape.frame_index][i - start_y][j - start_x] == 1:
+				if shape.frames[shape.frame_index][i - start_y][j - start_x] == 1 or board[i][j] == 2:
 					board[i][j] = 2
 				else: 
 					board[i][j] = 0
 			else:
-				board[i][j] = shape.frames[shape.frame_index][i - start_y][j - start_x]
+				if board[i][j] == 2:
+					pass
+				else:
+					board[i][j] = shape.frames[shape.frame_index][i - start_y][j - start_x]
+
+# sets an array with all the coords of the shape's last row
+# use this to calc if it hits another block, ie to build the wall
+func _set_shape_last_row_coords(shape, i, j, start_y, start_x):
+	if shape.frames[shape.frame_index][i - start_y][j - start_x] == 1:
+		shape.coords.push_back({'x': j, 'y': i})
 
 
+	
 
 func _on_shape_shape_is_set():
 	_place_shape(shape, 2)
