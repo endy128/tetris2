@@ -9,18 +9,10 @@ const START_Y = 130
 const GRID_BG = "#000000"
 const GRID_COLOUR = "#FFFFFF"
 
-var shape_i
-var shape_j
-var shape_l
-var shape_o
-var shape_s
-var shape_t
-var shape_z
+
 var shape
 
-var shape_array = [
-	
-]
+var shape_array = []
 
 var accel = 2
 var speed = 50
@@ -65,7 +57,7 @@ func _input(event):
 		if event.keycode == KEY_LEFT:
 			shape.move(-1)
 		if event.keycode == KEY_DOWN:
-			time = 50
+			time = 1000
 		if event.is_action_released("down"):
 			time = 0
 
@@ -78,36 +70,42 @@ func _process(delta):
 			shape.drop()
 			_clear_board()
 			_place_shape(shape, shape.is_set)
-			_render_board()
+#			_render_board()
 			queue_redraw()
 			return
 		_clear_board()
 		_place_shape(shape, shape.is_set)
-		_render_board()
+#		_render_board()
 		queue_redraw()
 	else:
 		_spawn_shape(randi() % 7)
-#		_spawn_shape(1)
+#		_spawn_shape(0)
 
 
 	
 func _draw():
-	draw_rect( Rect2(START_X, START_Y, COLUMNS * BLOCK_SIZE, ROWS * BLOCK_SIZE), GRID_BG, true, GRID_WIDTH)
+	#draw the outline of the board
+	draw_rect( Rect2(START_X, START_Y, COLUMNS * BLOCK_SIZE, ROWS * BLOCK_SIZE), GRID_BG, GRID_WIDTH)
 	# draw the column gridlines
 	for i in range(START_X, BLOCK_SIZE * COLUMNS + START_X + 1, BLOCK_SIZE):
 		draw_line( Vector2(i , START_Y), Vector2( i, ROWS * BLOCK_SIZE + START_Y), GRID_COLOUR, GRID_WIDTH)
-	
 	# draw the row gridlines
 	for i in range(START_Y, BLOCK_SIZE * ROWS + START_Y + 1, BLOCK_SIZE):
 		draw_line(Vector2(START_X, i), Vector2(COLUMNS * BLOCK_SIZE + START_X, i ), GRID_COLOUR, GRID_WIDTH)
+	# fill the squares in
+	for i in ROWS:
+		for j in COLUMNS:
+			if board[i][j] != 0:
+				var rect = Rect2(j * BLOCK_SIZE + START_X, i * BLOCK_SIZE + START_Y, BLOCK_SIZE, BLOCK_SIZE)
+				draw_rect(rect, GRID_COLOUR)
 	
-	_render_board()
+	
 
 
 
-func _fill_square( x, y ):
-	var rect = Rect2(x * BLOCK_SIZE + START_X, y * BLOCK_SIZE + START_Y, BLOCK_SIZE, BLOCK_SIZE)
-	draw_rect(rect, GRID_COLOUR)
+#func _fill_square( x, y ):
+#	var rect = Rect2(x * BLOCK_SIZE + START_X, y * BLOCK_SIZE + START_Y, BLOCK_SIZE, BLOCK_SIZE)
+#	draw_rect(rect, GRID_COLOUR)
 	
 func _print_board():
 	for i in ROWS:
@@ -119,12 +117,12 @@ func _set_square(x , y):
 	board[y][x] = 1
 
 
-func _render_board():
-	for i in ROWS:
-		for j in COLUMNS:
-			if board[i][j] != 0:
-				_fill_square(j,i)
-	queue_redraw()
+#func _render_board():
+#	for i in ROWS:
+#		for j in COLUMNS:
+#			if board[i][j] != 0:
+#				_fill_square(j,i)
+#	queue_redraw()
 
 
 func _clear_board():
@@ -134,52 +132,37 @@ func _clear_board():
 				pass
 			else:
 				board[i][j] = 0
+				
+func _set_up_new_shape(new_shape):
+	shape = new_shape.new()
+	shape.shape_is_set.connect(_on_shape_shape_is_set)
+	shape.my_board = board.duplicate()
 
 func _spawn_shape(num):
 	match (num):
 		0:
-			shape_i = preload("res://shape_i.gd")
-			shape = shape_i.new()
-			shape.shape_is_set.connect(_on_shape_shape_is_set)
-			shape.board = board
+			var new_shape = preload("res://shape_i.gd")
+			_set_up_new_shape(new_shape)
 		1:
-			shape_j = preload("res://shape_j.gd")
-			shape = shape_j.new()
-			shape.shape_is_set.connect(_on_shape_shape_is_set)
-			shape.board = board
-			
-
+			var new_shape = preload("res://shape_j.gd")
+			_set_up_new_shape(new_shape)
 		2:
-			shape_l = preload("res://shape_l.gd")
-			shape = shape_l.new()
-			shape.shape_is_set.connect(_on_shape_shape_is_set)
-			shape.board = board
-
+			var new_shape = preload("res://shape_l.gd")
+			_set_up_new_shape(new_shape)
 		3:
-			shape_o = preload("res://shape_o.gd")
-			shape = shape_o.new()
-			shape.shape_is_set.connect(_on_shape_shape_is_set)
-			shape.board = board
-
+			var new_shape = preload("res://shape_o.gd")
+			_set_up_new_shape(new_shape)
 		4:
-			shape_s = preload("res://shape_s.gd")
-			shape = shape_s.new()
-			shape.shape_is_set.connect(_on_shape_shape_is_set)
-			shape.board = board
-
+			var new_shape = preload("res://shape_s.gd")
+			_set_up_new_shape(new_shape)
 		5:
-			shape_t = preload("res://shape_t.gd")
-			shape = shape_t.new()
-			shape.shape_is_set.connect(_on_shape_shape_is_set)
-			shape.board = board
-
+			var new_shape = preload("res://shape_t.gd")
+			_set_up_new_shape(new_shape)
 		6:
-			shape_z = preload("res://shape_z.gd")
-			shape = shape_z.new()
-			shape.shape_is_set.connect(_on_shape_shape_is_set)
-			shape.board = board
+			var new_shape = preload("res://shape_z.gd")
+			_set_up_new_shape(new_shape)
 			
-	_place_shape(shape, 1)
+	_place_shape(shape, shape.is_set)
 	
 func _place_shape(shape, value):
 	shape.coords = []
@@ -214,5 +197,5 @@ func _set_shape_last_row_coords(shape, i, j, start_y, start_x):
 	
 
 func _on_shape_shape_is_set():
-	_place_shape(shape, 2)
+	_place_shape(shape, shape.is_set)
 	_print_board()
