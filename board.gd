@@ -15,7 +15,7 @@ var shape
 var shape_array = []
 
 var accel = 2
-var speed = 50
+var speed = 20  # 50
 var time = 0
 
 var board = [
@@ -68,14 +68,8 @@ func _process(delta):
 		if time > 10:
 			time = 0
 			shape.drop()
-			_clear_board()
-			_place_shape(shape, shape.is_set)
-#			_render_board()
-			queue_redraw()
-			return
 		_clear_board()
 		_place_shape(shape, shape.is_set)
-#		_render_board()
 		queue_redraw()
 	else:
 		_spawn_shape(randi() % 7)
@@ -102,11 +96,6 @@ func _draw():
 	
 
 
-
-#func _fill_square( x, y ):
-#	var rect = Rect2(x * BLOCK_SIZE + START_X, y * BLOCK_SIZE + START_Y, BLOCK_SIZE, BLOCK_SIZE)
-#	draw_rect(rect, GRID_COLOUR)
-	
 func _print_board():
 	for i in ROWS:
 		print(board[i])
@@ -115,14 +104,6 @@ func _print_board():
 
 func _set_square(x , y):
 	board[y][x] = 1
-
-
-#func _render_board():
-#	for i in ROWS:
-#		for j in COLUMNS:
-#			if board[i][j] != 0:
-#				_fill_square(j,i)
-#	queue_redraw()
 
 
 func _clear_board():
@@ -198,4 +179,4 @@ func _set_shape_last_row_coords(shape, i, j, start_y, start_x):
 
 func _on_shape_shape_is_set():
 	_place_shape(shape, shape.is_set)
-	_print_board()
+#	_print_board()

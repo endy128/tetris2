@@ -26,26 +26,30 @@ func drop():
 		self.queue_free()
 		
 func move(direction):
-	_check_space_to_side(direction)
 	if _check_if_can_move(direction):
+		for lines in _get_board_of_shape_placement(direction):
+			if lines.find(2) == 0:
+				return
 		position.x += direction
 	else:
 		return
 
-# FIXME
-#returns true if there is space in the direction of movement
-func _check_space_to_side(direction):
+	
+func _get_board_of_shape_placement(direction):
 	var start_x = position.x + direction
 	var start_y = position.y
 	var num_cols = len(self.frames[self.frame_index][0])
 	var num_rows = len(self.frames[self.frame_index])
+	var board_snapshot = self.frames[self.frame_index].duplicate(true)
 	for i in range(start_y, start_y + num_rows):
 		for j in range(start_x, start_x + num_cols):
-			if self.frames[self.frame_index][i - start_y][j - start_x] and my_board[i][j]:
-				print("false")
-				return false
-	print("true")
-	return true
+			board_snapshot[i - start_y][j - start_x] = my_board[i][j]
+	return board_snapshot
+
+func _print_board():
+	for i in _ROWS:
+		print(my_board[i])
+	print('--------------')
 		
 func _check_if_can_move(direction):
 	if position.x + direction >= 0 and position.x + direction <= (10 - len(self.frames[self.frame_index][0])):
