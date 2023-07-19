@@ -27,15 +27,18 @@ func drop():
 		
 func move(direction):
 	if _check_if_can_move(direction):
-		for lines in _get_board_of_shape_placement(direction):
-			if lines.find(2) == 0:
-				return
+		var snapshot = _get_snapshop_of_board_where_shape_placed(direction)
+		for i in range(0, len(snapshot)):
+			for j in range(0, len(snapshot[i])):
+				if snapshot[i][j] + self.frames[self.frame_index][i][j] > 2:
+					return 
 		position.x += direction
 	else:
 		return
 
-	
-func _get_board_of_shape_placement(direction):
+# returns an array of the part of the board where the shape would
+# occupy if it moved there
+func _get_snapshop_of_board_where_shape_placed(direction):
 	var start_x = position.x + direction
 	var start_y = position.y
 	var num_cols = len(self.frames[self.frame_index][0])
