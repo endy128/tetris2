@@ -1,6 +1,7 @@
 extends Node
 class_name Shape
 const _ROWS = preload("res://board.gd").ROWS
+const _COLUMNS = preload("res://board.gd").COLUMNS
 var my_board
 var is_active = true
 var is_set = 1  # 1 for active, 2 for set
@@ -27,7 +28,7 @@ func drop():
 		
 func move(direction):
 	if _check_if_can_move(direction):
-		var snapshot = _get_snapshop_of_board_where_shape_placed(direction)
+		var snapshot = _get_snapshop_of_board_where_shape_placed(direction, 0)
 		for i in range(0, len(snapshot)):
 			for j in range(0, len(snapshot[i])):
 				if snapshot[i][j] + self.frames[self.frame_index][i][j] > 2:
@@ -36,14 +37,16 @@ func move(direction):
 	else:
 		return
 
+
+
 # returns an array of the part of the board where the shape would
 # occupy if it moved there
-func _get_snapshop_of_board_where_shape_placed(direction):
+func _get_snapshop_of_board_where_shape_placed(direction, rotation):
 	var start_x = position.x + direction
 	var start_y = position.y
-	var num_cols = len(self.frames[self.frame_index][0])
-	var num_rows = len(self.frames[self.frame_index])
-	var board_snapshot = self.frames[self.frame_index].duplicate(true)
+	var num_cols = len(self.frames[self.frame_index + rotation][0])
+	var num_rows = len(self.frames[self.frame_index + rotation])
+	var board_snapshot = self.frames[self.frame_index + rotation].duplicate(true)
 	for i in range(start_y, start_y + num_rows):
 		for j in range(start_x, start_x + num_cols):
 			board_snapshot[i - start_y][j - start_x] = my_board[i][j]
@@ -70,23 +73,12 @@ func _print_array(arr):
 		print("Row: " + str(row) + " " + str(arr[row]))
 
 func rotate(direction):
-	if direction == 1:
-		self.frame_index += 1
-		self.frame_index = self.frame_index % len(self.frames)
-		return self.frames[self.frame_index]
-	if direction == -1:
-		self.frame_index -= 1
-		self.frame_index = self.frame_index % len(self.frames)
-		return self.frames[self.frame_index]
+	if _check_if_can_rotate(direction):
+		self.frame_index += direction
+		self.frame_index %= len(self.frames)
+	else: 
+		return
 
-
-#func _check_if_can_drop2():
-#	if position.y + _get_shape_height(self) < ( _ROWS):
-#		return true
-#	else:
-#		is_active = false
-#		return false
-		
 
 func _check_if_can_drop():
 	if not _check_for_collision() and position.y + _get_shape_height() < ( _ROWS):
@@ -103,10 +95,25 @@ func _check_for_collision():
 		if my_board[item.y + 1][item.x] == 2:
 			return true
 		else:
-			
 			return false
 			
 func _get_shape_height():
 	return len(self.frames[self.frame_index])
 	
 
+
+func _check_if_can_rotate(direction):
+	# returns false if the shape rotates and pushes it off the board
+	var _frame_index = (self.frame_index + direction) % len(self.frames)
+	var _frame_cols = len(self.frames[_frame_index][0])
+	print("index: " + str(_frame_index) + " cols: " + str(_frame_cols))
+	if (position.x + _frame_cols) > _COLUMNS:
+		print ("HIT")
+		return false
+	else:
+		return true
+
+# checks the board for where the shape will be and returns true if
+# the shape will collide with another placed block ('2') or goes off board
+func _check_for_valid_move(coords, frame, direction):
+	pass
