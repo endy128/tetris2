@@ -14,6 +14,10 @@ const FLASHES = 5
 const FLASH_SPEED = 2
 var FLASHING = false
 
+var TETROMINO = {0: 'I', 1: 'J', 2: 'L',3: 'O',4: 'S',5: 'T',6: 'Z'}
+
+var next_shape = randi() % 7
+var current_shape = null
 
 var shape
 var shape_array = []
@@ -57,7 +61,10 @@ var board = [
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	_spawn_shape(randi() % 7)
+	pass
+#	current_shape = next_shape
+#	next_shape = randi() % 7
+#	_spawn_shape(randi() % 7)
 
 
 func _input(event):
@@ -107,8 +114,11 @@ func _process(delta):
 #			_wipe_lines(lines)
 #			_drop_lines(lines)
 	elif not FLASHING:
-		_spawn_shape(randi() % 7)
+		current_shape = next_shape
+		next_shape = randi() % 7
+		_spawn_shape(current_shape)
 #		_spawn_shape(0)
+		print("Next Shape: " + str(TETROMINO[next_shape]))
 
 func _check_for_line():
 	var lines_to_wipe = []
@@ -192,34 +202,36 @@ func _clear_board():
 			else:
 				board[i][j] = 0
 				
-func _set_up_new_shape(new_shape):
+func _set_up_new_shape(new_shape, pos):
 	shape = new_shape.new()
 	shape.shape_is_set.connect(_on_shape_shape_is_set)
 	shape.my_board = board.duplicate()
+	# amend the start y position if the shape is smaller than the 'i' piece
+	shape.position = {'x': 4, "y": pos}
 
 func _spawn_shape(num):
 	match (num):
 		0:
 			var new_shape = preload("res://shape_i.gd")
-			_set_up_new_shape(new_shape)
+			_set_up_new_shape(new_shape, 0)
 		1:
 			var new_shape = preload("res://shape_j.gd")
-			_set_up_new_shape(new_shape)
+			_set_up_new_shape(new_shape, 1)
 		2:
 			var new_shape = preload("res://shape_l.gd")
-			_set_up_new_shape(new_shape)
+			_set_up_new_shape(new_shape, 1)
 		3:
 			var new_shape = preload("res://shape_o.gd")
-			_set_up_new_shape(new_shape)
+			_set_up_new_shape(new_shape, 2)
 		4:
 			var new_shape = preload("res://shape_s.gd")
-			_set_up_new_shape(new_shape)
+			_set_up_new_shape(new_shape, 1)
 		5:
 			var new_shape = preload("res://shape_t.gd")
-			_set_up_new_shape(new_shape)
+			_set_up_new_shape(new_shape, 1)
 		6:
 			var new_shape = preload("res://shape_z.gd")
-			_set_up_new_shape(new_shape)
+			_set_up_new_shape(new_shape, 1)
 			
 	_place_shape(shape, shape.is_set)
 	
