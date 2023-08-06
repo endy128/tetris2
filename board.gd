@@ -151,12 +151,15 @@ func _place_shape(shape, value):
 	var start_y = shape.position.y
 	var num_cols = len(shape.frames[shape.frame_index][0])
 	var num_rows = len(shape.frames[shape.frame_index])
+	_reset_coords(shape)
 	for i in range(start_y, start_y + num_rows):
 		for j in range(start_x, start_x + num_cols):
 			# when the last row of the shape is being placed
 			# set the co-ords of the filled squares
-			if i == start_y + num_rows - 1:
-				_set_shape_last_row_coords(shape, i, j, start_y, start_x)
+#			if i == start_y + num_rows - 1:
+
+			# add all current shape coords to an array for checking on collision
+			_set_shape_last_row_coords(shape, i, j, start_y, start_x)
 			if value == 2:
 				if shape.frames[shape.frame_index][i - start_y][j - start_x] == 1 or board[i][j] == 2:
 					board[i][j] = 2
@@ -174,7 +177,9 @@ func _set_shape_last_row_coords(shape, i, j, start_y, start_x):
 	if shape.frames[shape.frame_index][i - start_y][j - start_x] == 1:
 		shape.coords.push_back({'x': j, 'y': i})
 
-
+func _reset_coords(shape):
+	shape.coords = []
+	return
 	
 
 func _on_shape_shape_is_set():

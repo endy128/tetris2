@@ -81,7 +81,8 @@ func rotate(direction):
 
 
 func _check_if_can_drop():
-	if not _check_for_collision() and position.y + _get_shape_height() < ( _ROWS):
+#	if not _check_for_collision() and position.y + _get_shape_height() < _ROWS:
+	if not _check_for_collision():
 		return true
 	else:
 		is_active = false
@@ -89,13 +90,14 @@ func _check_if_can_drop():
 
 
 func _check_for_collision():
+	# return true if the shape will collide with something on the next drop
 	for item in coords:
-		if item.y + 1 > 19:
+		# check if its at the end of the board
+		if item.y + 1 >= _ROWS:
 			return true
 		if my_board[item.y + 1][item.x] == 2:
 			return true
-		else:
-			return false
+	return false
 			
 func _get_shape_height():
 	return len(self.frames[self.frame_index])
@@ -108,7 +110,6 @@ func _check_if_can_rotate(direction):
 	var _frame_cols = len(self.frames[_frame_index][0])
 	print("index: " + str(_frame_index) + " cols: " + str(_frame_cols))
 	if (position.x + _frame_cols) > _COLUMNS:
-		print ("HIT")
 		return false
 	else:
 		return true
