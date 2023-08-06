@@ -1,11 +1,13 @@
 extends Node2D
 
 const COLUMNS = 10
-const ROWS = 20
+const ROWS = 24
+const STAGING = 4
+const VISIBLE_ROWS = 20
 const BLOCK_SIZE = 30
 const GRID_WIDTH = 1
 const START_X = 25
-const START_Y = 130
+const START_Y = 10
 const GRID_BG = "#000000"
 const GRID_COLOUR = "#FFFFFF"
 const FLASHES = 5
@@ -27,6 +29,10 @@ var flashes_done = 0
 var lines = false
 
 var board = [
+		[0,0,0,0,0,0,0,0,0,0], #
+		[0,0,0,0,0,0,0,0,0,0], #
+		[0,0,0,0,0,0,0,0,0,0], #
+		[0,0,0,0,0,0,0,0,0,0], #
 		[0,0,0,0,0,0,0,0,0,0],
 		[0,0,0,0,0,0,0,0,0,0],
 		[0,0,0,0,0,0,0,0,0,0],
@@ -148,20 +154,18 @@ func _flash_lines(rows, flash_type):
 	if flash_type == true:
 		_unblank_line(rows)
 
-		
-		
 	
 func _draw():
 	#draw the outline of the board
-	draw_rect( Rect2(START_X, START_Y, COLUMNS * BLOCK_SIZE, ROWS * BLOCK_SIZE), GRID_BG, GRID_WIDTH)
+	draw_rect( Rect2(START_X, START_Y + (BLOCK_SIZE * STAGING), COLUMNS * BLOCK_SIZE, VISIBLE_ROWS * BLOCK_SIZE), GRID_BG, GRID_WIDTH)
 	# draw the column gridlines
-	for i in range(START_X, BLOCK_SIZE * COLUMNS + START_X + 1, BLOCK_SIZE):
-		draw_line( Vector2(i , START_Y), Vector2( i, ROWS * BLOCK_SIZE + START_Y), GRID_COLOUR, GRID_WIDTH)
+	for i in range(START_X , BLOCK_SIZE * COLUMNS + START_X + 1, BLOCK_SIZE):
+		draw_line( Vector2(i , START_Y + (BLOCK_SIZE * STAGING)), Vector2( i, ROWS * BLOCK_SIZE + START_Y), GRID_COLOUR, GRID_WIDTH)
 	# draw the row gridlines
-	for i in range(START_Y, BLOCK_SIZE * ROWS + START_Y + 1, BLOCK_SIZE):
-		draw_line(Vector2(START_X, i), Vector2(COLUMNS * BLOCK_SIZE + START_X, i ), GRID_COLOUR, GRID_WIDTH)
+	for i in range(START_Y + (BLOCK_SIZE * STAGING), BLOCK_SIZE * ROWS + START_Y + 1, BLOCK_SIZE):
+		draw_line( Vector2(START_X, i), Vector2(COLUMNS * BLOCK_SIZE + START_X, i ), GRID_COLOUR, GRID_WIDTH)
 	# fill the squares in
-	for i in ROWS:
+	for i in range(STAGING, ROWS):
 		for j in COLUMNS:
 			if board[i][j] != 0:
 				var rect = Rect2(j * BLOCK_SIZE + START_X, i * BLOCK_SIZE + START_Y, BLOCK_SIZE, BLOCK_SIZE)
@@ -225,7 +229,6 @@ func _place_shape(shape, value):
 	var start_y = shape.position.y
 	var num_cols = len(shape.frames[shape.frame_index][0])
 	var num_rows = len(shape.frames[shape.frame_index])
-#	_reset_coords(shape)
 	for i in range(start_y, start_y + num_rows):
 		for j in range(start_x, start_x + num_cols):
 			# add all current shape coords to an array for checking on collision
@@ -247,10 +250,6 @@ func _set_shape_last_row_coords(shape, i, j, start_y, start_x):
 	if shape.frames[shape.frame_index][i - start_y][j - start_x] == 1:
 		shape.coords.push_back({'x': j, 'y': i})
 
-#func _reset_coords(shape):
-#	shape.coords = []
-#	return
-#
 
 func _on_shape_shape_is_set():
 	_place_shape(shape, shape.is_set)
