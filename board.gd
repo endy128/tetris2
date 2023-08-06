@@ -8,15 +8,23 @@ const START_X = 25
 const START_Y = 130
 const GRID_BG = "#000000"
 const GRID_COLOUR = "#FFFFFF"
+const FLASHES = 5
+const FLASH_SPEED = 2
+var FLASHING = false
 
 
 var shape
-
 var shape_array = []
 
+# GAME SPEED
 var accel = 2
 var speed = 20  # 50
 var time = 0
+
+# When a line is full, control the flashes
+var flash_type = false
+var flashes_done = 0
+var lines = false
 
 var board = [
 		[0,0,0,0,0,0,0,0,0,0],
@@ -37,8 +45,8 @@ var board = [
 		[0,0,0,0,0,0,0,0,0,0],
 		[0,0,0,0,0,0,0,0,0,0],
 		[0,0,0,0,0,0,0,0,0,0],
-		[2,2,2,2,2,2,2,0,2,2],
-		[2,2,2,2,2,2,2,0,2,2],
+		[0,0,0,0,0,0,0,0,0,0],
+		[0,0,0,0,0,0,0,0,0,0],
 	]
 
 # Called when the node enters the scene tree for the first time.
@@ -63,19 +71,36 @@ func _input(event):
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	if is_instance_valid(shape):  # check the shape has not been destroyed
+	queue_redraw()
+	
+
+	if FLASHING:
+		time += speed * delta
+		if time > FLASH_SPEED:
+			time = 0
+			_flash_lines(lines, flash_type)
+			flash_type = !flash_type
+			flashes_done += 1
+			if flashes_done > FLASHES:
+				flashes_done = 0
+				FLASHING = false
+				_wipe_lines(lines)
+				_drop_lines(lines)
+				
+	
+	if is_instance_valid(shape) and not FLASHING:  # check the shape has not been destroyed
 		time += speed * delta
 		if time > 10:
 			time = 0
 			shape.drop()
 		_clear_board()
 		_place_shape(shape, shape.is_set)
-		queue_redraw()
-		var lines = _check_for_line()
+		lines = _check_for_line()
 		if lines:
-			_wipe_lines(lines)
-			_drop_lines(lines)
-	else:
+			FLASHING = true
+#			_wipe_lines(lines)
+#			_drop_lines(lines)
+	elif not FLASHING:
 		_spawn_shape(randi() % 7)
 #		_spawn_shape(0)
 
@@ -98,16 +123,33 @@ func _wipe_lines(rows):
 		for col in COLUMNS:
 			board[row][col] = 0
 			
-func _drop_lines(lines):
-	for line in lines:
-		_move_all_down(line)
+func _drop_lines(rows):
+	for row in rows:
+		_move_all_down(row)
 	
 func _move_all_down(row):
 	for i in range(row -1, -1, -1):  ## may need to be row-1
-		print(i)
 		for j in COLUMNS:
 			board[i+1][j] = board[i][j]
+			
+func _blank_line(rows):
+	for row in rows:
+		for col in COLUMNS:
+			board[row][col] = 0
+			
+func _unblank_line(rows):
+	for row in rows:
+		for col in COLUMNS:
+			board[row][col] = 2
 				
+func _flash_lines(rows, flash_type):
+	if flash_type == false:
+		_blank_line(rows)
+	if flash_type == true:
+		_unblank_line(rows)
+
+		
+		
 	
 func _draw():
 	#draw the outline of the board
@@ -183,13 +225,9 @@ func _place_shape(shape, value):
 	var start_y = shape.position.y
 	var num_cols = len(shape.frames[shape.frame_index][0])
 	var num_rows = len(shape.frames[shape.frame_index])
-	_reset_coords(shape)
+#	_reset_coords(shape)
 	for i in range(start_y, start_y + num_rows):
 		for j in range(start_x, start_x + num_cols):
-			# when the last row of the shape is being placed
-			# set the co-ords of the filled squares
-#			if i == start_y + num_rows - 1:
-
 			# add all current shape coords to an array for checking on collision
 			_set_shape_last_row_coords(shape, i, j, start_y, start_x)
 			if value == 2:
@@ -209,10 +247,10 @@ func _set_shape_last_row_coords(shape, i, j, start_y, start_x):
 	if shape.frames[shape.frame_index][i - start_y][j - start_x] == 1:
 		shape.coords.push_back({'x': j, 'y': i})
 
-func _reset_coords(shape):
-	shape.coords = []
-	return
-	
+#func _reset_coords(shape):
+#	shape.coords = []
+#	return
+#
 
 func _on_shape_shape_is_set():
 	_place_shape(shape, shape.is_set)
