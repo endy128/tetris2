@@ -37,8 +37,8 @@ var board = [
 		[0,0,0,0,0,0,0,0,0,0],
 		[0,0,0,0,0,0,0,0,0,0],
 		[0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0],
+		[2,2,2,2,2,2,2,0,2,2],
+		[2,2,2,2,2,2,2,0,2,2],
 	]
 
 # Called when the node enters the scene tree for the first time.
@@ -71,11 +71,43 @@ func _process(delta):
 		_clear_board()
 		_place_shape(shape, shape.is_set)
 		queue_redraw()
+		var lines = _check_for_line()
+		if lines:
+			_wipe_lines(lines)
+			_drop_lines(lines)
 	else:
 		_spawn_shape(randi() % 7)
 #		_spawn_shape(0)
 
-
+func _check_for_line():
+	var lines_to_wipe = []
+	for i in ROWS:
+		for j in COLUMNS:
+			if board[i][j] == 2:
+				if j == COLUMNS - 1:
+					lines_to_wipe.push_back(i)
+			else: 
+				break
+	if lines_to_wipe.is_empty():
+		return false
+	else:
+		return lines_to_wipe
+		
+func _wipe_lines(rows):
+	for row in rows:
+		for col in COLUMNS:
+			board[row][col] = 0
+			
+func _drop_lines(lines):
+	for line in lines:
+		_move_all_down(line)
+	
+func _move_all_down(row):
+	for i in range(row -1, -1, -1):  ## may need to be row-1
+		print(i)
+		for j in COLUMNS:
+			board[i+1][j] = board[i][j]
+				
 	
 func _draw():
 	#draw the outline of the board

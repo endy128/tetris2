@@ -20,8 +20,6 @@ func drop():
 	if _check_if_can_drop() == true and is_active == true:
 		position.y += 1
 	else:
-		print("Destroying shape")
-		print(Time.get_ticks_msec())
 		is_set = 2
 		shape_is_set.emit()
 		self.queue_free()
@@ -108,7 +106,6 @@ func _check_if_can_rotate(direction):
 	# returns false if the shape rotates and pushes it off the board
 	var _frame_index = (self.frame_index + direction) % len(self.frames)
 	var _frame_cols = len(self.frames[_frame_index][0])
-	print("index: " + str(_frame_index) + " cols: " + str(_frame_cols))
 	if (position.x + _frame_cols) > _COLUMNS:
 		return false
 	else:
