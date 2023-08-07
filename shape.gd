@@ -111,7 +111,3 @@ func _check_if_can_rotate(direction):
 	else:
 		return true
 
-# checks the board for where the shape will be and returns true if
-# the shape will collide with another placed block ('2') or goes off board
-func _check_for_valid_move(coords, frame, direction):
-	pass
