@@ -16,8 +16,14 @@ const NEXT_SHAPE_X = (COLUMNS * BLOCK_SIZE) + START_X + GAP
 const NEXT_SHAPE_Y = START_Y + (BLOCK_SIZE * STAGING)
 
 const FLASHES = 5
-const FLASH_SPEED = 2
-var FLASHING = false
+const FLASH_SPEED = 1
+var is_flashing = false
+
+# points for placing shape and clearing a line & tetris
+var score = 0
+const SCORE_PLACE = 10
+const SCORE_LINE = 100
+const SCORE_BONUS = 200
 
 # 0: pre-game, 1: play, 2: game over, 3: credits
 var game_state = 0
@@ -74,7 +80,7 @@ func _ready():
 
 
 func _input(event):
-	if event is InputEventKey and event.pressed:
+	if event is InputEventKey and event.pressed and is_instance_valid(shape):
 		if event.keycode == KEY_SPACE or event.keycode == KEY_UP:
 			shape.rotate(1)
 		if event.keycode == KEY_ALT:
@@ -85,15 +91,15 @@ func _input(event):
 			shape.move(-1)
 		if event.keycode == KEY_DOWN:
 			time = 1000
-		if event.is_action_released("down"):
-			time = 0
+	if  event is InputEventKey and event.is_action_released("down"):
+		time = 0
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	queue_redraw()
 	
-
-	if FLASHING:
+	
+	if is_flashing:
 		time += speed * delta
 		if time > FLASH_SPEED:
 			time = 0
@@ -102,35 +108,45 @@ func _process(delta):
 			flashes_done += 1
 			if flashes_done > FLASHES:
 				flashes_done = 0
-				FLASHING = false
+				is_flashing = false
 				_wipe_lines(lines)
 				_drop_lines(lines)
+				_add_score(len(lines), SCORE_LINE)
 				
 	
-	if is_instance_valid(shape) and not FLASHING:  # check the shape has not been destroyed
+	if is_instance_valid(shape) and not is_flashing:  # check the shape has not been destroyed
 		time += speed * delta
 		if time > 10:
-			time = 0
+			if time < 1000:
+				time = 0
 			shape.drop()
 		_clear_board()
 		_place_shape(shape, shape.is_set)
 		lines = _check_for_line()
 		if lines:
-			FLASHING = true
-	elif not FLASHING:
+			is_flashing = true
+	elif not is_flashing:
 		current_shape = next_shape
 		next_shape = randi() % 7
 		_spawn_shape(current_shape)
 #		_spawn_shape(0)
 		print("Next Shape: " + str(TETROMINO[next_shape]))
 
+func _add_score(points, type):
+	if (points == 4):
+		score += SCORE_BONUS
+		print("BONUS: " + str(SCORE_BONUS))
+	score += points * type
+	print("SCORE: " + str(score))
+
+		
 func _check_for_line():
 	var lines_to_wipe = []
-	for i in ROWS:
-		for j in COLUMNS:
-			if board[i][j] == 2:
-				if j == COLUMNS - 1:
-					lines_to_wipe.push_back(i)
+	for row in ROWS:
+		for col in COLUMNS:
+			if board[row][col] == 2:
+				if col == COLUMNS - 1:
+					lines_to_wipe.push_back(row)
 			else: 
 				break
 	if lines_to_wipe.is_empty():
@@ -147,10 +163,10 @@ func _drop_lines(rows):
 	for row in rows:
 		_move_all_down(row)
 	
-func _move_all_down(row):
-	for i in range(row -1, -1, -1):
-		for j in COLUMNS:
-			board[i+1][j] = board[i][j]
+func _move_all_down(move_row):
+	for row in range(move_row -1, -1, -1):
+		for col in COLUMNS:
+			board[row+1][col] = board[row][col]
 			
 func _blank_line(rows):
 	for row in rows:
@@ -180,10 +196,10 @@ func _draw():
 		draw_line( Vector2(START_X, i), Vector2(COLUMNS * BLOCK_SIZE + START_X, i ), GRID_COLOUR, GRID_WIDTH)
 	
 	# fill any squares in the board that != 0
-	for i in range(STAGING, ROWS):
-		for j in COLUMNS:
-			if board[i][j] != 0:
-				var rect = Rect2(j * BLOCK_SIZE + START_X, i * BLOCK_SIZE + START_Y, BLOCK_SIZE, BLOCK_SIZE)
+	for row in range(STAGING, ROWS):
+		for col in COLUMNS:
+			if board[row][col] != 0:
+				var rect = Rect2(col * BLOCK_SIZE + START_X, row * BLOCK_SIZE + START_Y, BLOCK_SIZE, BLOCK_SIZE)
 				draw_rect(rect, GRID_COLOUR)
 	
 	# draw the next shape box
@@ -228,22 +244,18 @@ func _get_next_shape_matrix(next_shape):
 					[1,0]]
 
 func _print_board():
-	for i in ROWS:
-		print(board[i])
+	for row in ROWS:
+		print(board[row])
 	print('--------------')
 
 
-func _set_square(x , y):
-	board[y][x] = 1
-
-
 func _clear_board():
-	for i in ROWS:
-		for j in COLUMNS:
-			if board[i][j] == 2:
+	for row in ROWS:
+		for col in COLUMNS:
+			if board[row][col] == 2:
 				pass
 			else:
-				board[i][j] = 0
+				board[row][col] = 0
 				
 func _set_up_new_shape(new_shape, pos):
 	shape = new_shape.new()
@@ -284,30 +296,31 @@ func _place_shape(shape, value):
 	var start_y = shape.position.y
 	var num_cols = len(shape.frames[shape.frame_index][0])
 	var num_rows = len(shape.frames[shape.frame_index])
-	for i in range(start_y, start_y + num_rows):
-		for j in range(start_x, start_x + num_cols):
+	for row in range(start_y, start_y + num_rows):
+		for col in range(start_x, start_x + num_cols):
 			# add all current shape coords to an array for checking on collision
-			_set_shape_last_row_coords(shape, i, j, start_y, start_x)
+			_set_shape_last_row_coords(shape, row, col, start_y, start_x)
 			if value == 2:
-				if shape.frames[shape.frame_index][i - start_y][j - start_x] == 1 or board[i][j] == 2:
-					board[i][j] = 2
+				if shape.frames[shape.frame_index][row - start_y][col - start_x] == 1 or board[row][col] == 2:
+					board[row][col] = 2
 				else: 
-					board[i][j] = 0
+					board[row][col] = 0
 			else:
-				if board[i][j] == 2:
+				if board[row][col] == 2:
 					pass
 				else:
-					board[i][j] = shape.frames[shape.frame_index][i - start_y][j - start_x]
+					board[row][col] = shape.frames[shape.frame_index][row - start_y][col - start_x]
 
 # sets an array with all the coords of the shape's last row
 # use this to calc if it hits another block, ie to build the wall
-func _set_shape_last_row_coords(shape, i, j, start_y, start_x):
-	if shape.frames[shape.frame_index][i - start_y][j - start_x] == 1:
-		shape.coords.push_back({'x': j, 'y': i})
+func _set_shape_last_row_coords(shape, row, col, start_y, start_x):
+	if shape.frames[shape.frame_index][row - start_y][col - start_x] == 1:
+		shape.coords.push_back({'x': col, 'y': row})
 
 
 func _on_shape_shape_is_set():
 	_place_shape(shape, shape.is_set)
+	_add_score(1, SCORE_PLACE)
 	if shape.position.y < 4:
 		print("GAME OVER !!")
 		game_state = 2

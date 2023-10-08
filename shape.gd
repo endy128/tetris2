@@ -27,9 +27,9 @@ func drop():
 func move(direction):
 	if _check_if_can_move(direction):
 		var snapshot = _get_snapshop_of_board_where_shape_placed(direction, 0)
-		for i in range(0, len(snapshot)):
-			for j in range(0, len(snapshot[i])):
-				if snapshot[i][j] + self.frames[self.frame_index][i][j] > 2:
+		for row in range(0, len(snapshot)):
+			for col in range(0, len(snapshot[row])):
+				if snapshot[row][col] + self.frames[self.frame_index][row][col] > 2:
 					return 
 		position.x += direction
 	else:
@@ -45,14 +45,14 @@ func _get_snapshop_of_board_where_shape_placed(direction, rotation):
 	var num_cols = len(self.frames[self.frame_index + rotation][0])
 	var num_rows = len(self.frames[self.frame_index + rotation])
 	var board_snapshot = self.frames[self.frame_index + rotation].duplicate(true)
-	for i in range(start_y, start_y + num_rows):
-		for j in range(start_x, start_x + num_cols):
-			board_snapshot[i - start_y][j - start_x] = my_board[i][j]
+	for row in range(start_y, start_y + num_rows):
+		for col in range(start_x, start_x + num_cols):
+			board_snapshot[row - start_y][col - start_x] = my_board[row][col]
 	return board_snapshot
 
 func _print_board():
-	for i in _ROWS:
-		print(my_board[i])
+	for row in _ROWS:
+		print(my_board[row])
 	print('--------------')
 		
 func _check_if_can_move(direction):
