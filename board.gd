@@ -11,9 +11,16 @@ const START_Y = 0
 const GRID_BG = "#000000"
 const GRID_COLOUR = "#FFFFFF"
 
+const SQUARE_OUTLINE = "#ffffff"
+const SQUARE_BG = "#808080"
+const SQUARE_FG = "#d9d9d9"
+
 const GAP = 5
 const NEXT_SHAPE_X = (COLUMNS * BLOCK_SIZE) + START_X + GAP
 const NEXT_SHAPE_Y = START_Y + (BLOCK_SIZE * STAGING)
+
+const SCORE_BOX_X = (COLUMNS * BLOCK_SIZE) + START_X + GAP
+const SCORE_BOX_Y = START_Y + (BLOCK_SIZE * STAGING) + GAP + (5 * BLOCK_SIZE)
 
 const FLASHES = 5
 const FLASH_SPEED = 1
@@ -21,6 +28,7 @@ var is_flashing = false
 
 # points for placing shape and clearing a line & tetris
 var score = 0
+var level = 0
 const SCORE_PLACE = 10
 const SCORE_LINE = 100
 const SCORE_BONUS = 200
@@ -37,7 +45,7 @@ var shape
 var shape_array = []
 
 # GAME SPEED
-var accel = 2
+var accel = 0.0005
 var speed = 20  # 50
 var time = 0
 
@@ -45,6 +53,9 @@ var time = 0
 var flash_type = false
 var flashes_done = 0
 var lines = false
+
+var default_font = ThemeDB.fallback_font
+var default_font_size = ThemeDB.fallback_font_size
 
 var board = [
 		[0,0,0,0,0,0,0,0,0,0], # staginng, not drawn
@@ -100,6 +111,7 @@ func _process(delta):
 	
 	
 	if is_flashing:
+		speed += accel
 		time += speed * delta
 		if time > FLASH_SPEED:
 			time = 0
@@ -115,6 +127,7 @@ func _process(delta):
 				
 	
 	if is_instance_valid(shape) and not is_flashing:  # check the shape has not been destroyed
+		speed += accel
 		time += speed * delta
 		if time > 10:
 			if time < 1000:
@@ -188,23 +201,52 @@ func _flash_lines(rows, flash_type):
 func _draw():
 	#draw the outline of the board
 	draw_rect( Rect2(START_X, START_Y + (BLOCK_SIZE * STAGING), COLUMNS * BLOCK_SIZE, VISIBLE_ROWS * BLOCK_SIZE), GRID_BG, GRID_WIDTH)
+	draw_rect( Rect2(START_X, START_Y + (BLOCK_SIZE * STAGING), COLUMNS * BLOCK_SIZE, VISIBLE_ROWS * BLOCK_SIZE), GRID_COLOUR, false, GRID_WIDTH)
 	# draw the column gridlines
-	for i in range(START_X , BLOCK_SIZE * COLUMNS + START_X + 1, BLOCK_SIZE):
-		draw_line( Vector2(i , START_Y + (BLOCK_SIZE * STAGING)), Vector2( i, ROWS * BLOCK_SIZE + START_Y), GRID_COLOUR, GRID_WIDTH)
+	#for i in range(START_X , BLOCK_SIZE * COLUMNS + START_X + 1, BLOCK_SIZE):
+		#draw_line( Vector2(i , START_Y + (BLOCK_SIZE * STAGING)), Vector2( i, ROWS * BLOCK_SIZE + START_Y), GRID_COLOUR, GRID_WIDTH)
 	# draw the row gridlines
-	for i in range(START_Y + (BLOCK_SIZE * STAGING), BLOCK_SIZE * ROWS + START_Y + 1, BLOCK_SIZE):
-		draw_line( Vector2(START_X, i), Vector2(COLUMNS * BLOCK_SIZE + START_X, i ), GRID_COLOUR, GRID_WIDTH)
+	#for i in range(START_Y + (BLOCK_SIZE * STAGING), BLOCK_SIZE * ROWS + START_Y + 1, BLOCK_SIZE):
+		#draw_line( Vector2(START_X, i), Vector2(COLUMNS * BLOCK_SIZE + START_X, i ), GRID_COLOUR, GRID_WIDTH)
 	
+	const border_width = 1
+	const step_down = 4
+	const step_down_2 = step_down * 2
+		
 	# fill any squares in the board that != 0
 	for row in range(STAGING, ROWS):
 		for col in COLUMNS:
 			if board[row][col] != 0:
-				var rect = Rect2(col * BLOCK_SIZE + START_X, row * BLOCK_SIZE + START_Y, BLOCK_SIZE, BLOCK_SIZE)
-				draw_rect(rect, GRID_COLOUR)
+				var x = col * BLOCK_SIZE + START_X
+				var y = row * BLOCK_SIZE + START_Y
+				var width = BLOCK_SIZE
+				var height = BLOCK_SIZE
+			
+				var rect_0 = Rect2(x, y, width, height)
+				var rect_1 = Rect2(x, y, width - border_width, height - border_width)
+				var rect_2 = Rect2(x + step_down, y + step_down, width - (step_down * 2) - border_width, height - (step_down * 2) - border_width)
+				var rect_3 = Rect2(x + step_down_2, y + step_down_2, width - (step_down_2 * 2) - border_width, height - (step_down_2 * 2) - border_width)
+				draw_rect(rect_0, SQUARE_OUTLINE, false, 1)
+				draw_rect(rect_1, SQUARE_BG)
+				draw_rect(rect_2, SQUARE_FG)
+				draw_rect(rect_3, SQUARE_BG)
+				
 	
 	# draw the next shape box
 	draw_rect(Rect2(NEXT_SHAPE_X, NEXT_SHAPE_Y, 3 * BLOCK_SIZE, 5 * BLOCK_SIZE), GRID_BG, GRID_WIDTH)
 	draw_rect(Rect2(NEXT_SHAPE_X, NEXT_SHAPE_Y, 3 * BLOCK_SIZE, 5 * BLOCK_SIZE), GRID_COLOUR, false, GRID_WIDTH)
+	
+	# draw the score box
+	draw_rect(Rect2(SCORE_BOX_X, SCORE_BOX_Y, 3 * BLOCK_SIZE, 3 * BLOCK_SIZE), GRID_BG, GRID_WIDTH)
+	draw_rect(Rect2(SCORE_BOX_X, SCORE_BOX_Y, 3 * BLOCK_SIZE, 3 * BLOCK_SIZE), GRID_COLOUR, false, GRID_WIDTH)
+	
+	# draw the level text
+	draw_string(default_font, Vector2(SCORE_BOX_X + 5, SCORE_BOX_Y + 20), "LEVEL:", HORIZONTAL_ALIGNMENT_LEFT, -1, 14)
+	draw_string(default_font, Vector2(SCORE_BOX_X + (1.5 * BLOCK_SIZE), SCORE_BOX_Y + 40), str(level), HORIZONTAL_ALIGNMENT_LEFT, -1, 14)
+	
+	# draw the Score text
+	draw_string(default_font, Vector2(SCORE_BOX_X + 5, SCORE_BOX_Y + 60), "SCORE:", HORIZONTAL_ALIGNMENT_LEFT, -1, 14)
+	draw_string(default_font, Vector2(SCORE_BOX_X + 5, SCORE_BOX_Y + 80), "%010d" % score, HORIZONTAL_ALIGNMENT_LEFT, -1, 14)
 	
 	# draw the next shape in the box
 	var _next_shape = _get_next_shape_matrix(next_shape)
@@ -217,7 +259,18 @@ func _draw():
 	for row in len(_next_shape):
 		for col in len(_next_shape[0]):
 			if _next_shape[row][col] == 1:
-				draw_rect(Rect2(col * BLOCK_SIZE + NEXT_SHAPE_X + _left_padding, row * BLOCK_SIZE + NEXT_SHAPE_Y + _top_padding, BLOCK_SIZE, BLOCK_SIZE),GRID_COLOUR, GRID_WIDTH)
+				var x = col * BLOCK_SIZE + NEXT_SHAPE_X + _left_padding
+				var y = row * BLOCK_SIZE + NEXT_SHAPE_Y + _top_padding
+				var width = BLOCK_SIZE
+				var height = BLOCK_SIZE
+				var rect_0 = Rect2(x, y, width, height)
+				var rect_1 = Rect2(x, y, width - border_width, height - border_width)
+				var rect_2 = Rect2(x + step_down, y + step_down, width - (step_down * 2) - border_width, height - (step_down * 2) - border_width)
+				var rect_3 = Rect2(x + step_down_2, y + step_down_2, width - (step_down_2 * 2) - border_width, height - (step_down_2 * 2) - border_width)
+				draw_rect(rect_0, SQUARE_OUTLINE, false, 1)
+				draw_rect(rect_1, SQUARE_BG)
+				draw_rect(rect_2, SQUARE_FG)
+				draw_rect(rect_3, SQUARE_BG)
 	
 func _get_next_shape_matrix(next_shape):
 	match (next_shape):
