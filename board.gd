@@ -40,7 +40,7 @@ var is_flashing = false
 var score = 0
 const SCORE_PLACE = 10
 const SCORE_LINE = 100
-const SCORE_BONUS = 200
+const SCORE_BONUS = 500
 
 var level = 0
 const LEVEL_INCREASE = 10
