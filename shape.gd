@@ -2,6 +2,7 @@ extends Node
 class_name Shape
 const _ROWS = preload("res://board.gd").ROWS
 const _COLUMNS = preload("res://board.gd").COLUMNS
+var COLOUR = randi() % 5
 var my_board
 var is_active = true
 var is_set = 1  # 1 for active, 2 for set
@@ -47,7 +48,7 @@ func _get_snapshop_of_board_where_shape_placed(direction, rotation):
 	var board_snapshot = self.frames[self.frame_index + rotation].duplicate(true)
 	for row in range(start_y, start_y + num_rows):
 		for col in range(start_x, start_x + num_cols):
-			board_snapshot[row - start_y][col - start_x] = my_board[row][col]
+			board_snapshot[row - start_y][col - start_x] = my_board[row][col]['value']
 	return board_snapshot
 
 func _print_board():
@@ -93,7 +94,7 @@ func _check_for_collision():
 		# check if its at the end of the board
 		if item.y + 1 >= _ROWS:
 			return true
-		if my_board[item.y + 1][item.x] == 2:
+		if my_board[item.y + 1][item.x]['value'] == 2:
 			return true
 	return false
 			

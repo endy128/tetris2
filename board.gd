@@ -1,5 +1,15 @@
 extends Node2D
 
+const DEBUG = 0
+
+var SHAPE_COLOURS = {
+	0: Color.html('#264d73'),
+	1: Color.html('#732626'), 
+	2: Color.html('#732639'), 
+	3: Color.html('#737326'),
+	4: Color.html('#607326'),
+}
+
 const COLUMNS = 10
 const ROWS = 24
 const STAGING = 4
@@ -40,7 +50,6 @@ const LEVEL_ROLLOVER = 100
 
 # 0: pre-game, 1: play, 2: game over, 3: credits
 var game_state = 0
-var draw_grid = false
 
 var TETROMINO = {0: 'I', 1: 'J', 2: 'L',3: 'O',4: 'S',5: 'T',6: 'Z'}
 
@@ -63,37 +72,46 @@ var lines = false
 var default_font = ThemeDB.fallback_font
 var default_font_size = ThemeDB.fallback_font_size
 
-var board = [
-		[0,0,0,0,0,0,0,0,0,0], # staginng, not drawn
-		[0,0,0,0,0,0,0,0,0,0], # staginng, not drawn
-		[0,0,0,0,0,0,0,0,0,0], # staginng, not drawn
-		[0,0,0,0,0,0,0,0,0,0], # staginng, not drawn
-		[0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0],
-	]
+var board = []
+#var board = [
+#		[0,0,0,0,0,0,0,0,0,0], # staginng, not drawn
+#		[0,0,0,0,0,0,0,0,0,0], # staginng, not drawn
+#		[0,0,0,0,0,0,0,0,0,0], # staginng, not drawn
+#		[0,0,0,0,0,0,0,0,0,0], # staginng, not drawn
+#		[0,0,0,0,0,0,0,0,0,0],
+#		[0,0,0,0,0,0,0,0,0,0],
+#		[0,0,0,0,0,0,0,0,0,0],
+#		[0,0,0,0,0,0,0,0,0,0],
+#		[0,0,0,0,0,0,0,0,0,0],
+#		[0,0,0,0,0,0,0,0,0,0],
+#		[0,0,0,0,0,0,0,0,0,0],
+#		[0,0,0,0,0,0,0,0,0,0],
+#		[0,0,0,0,0,0,0,0,0,0],
+#		[0,0,0,0,0,0,0,0,0,0],
+#		[0,0,0,0,0,0,0,0,0,0],
+#		[0,0,0,0,0,0,0,0,0,0],
+#		[0,0,0,0,0,0,0,0,0,0],
+#		[0,0,0,0,0,0,0,0,0,0],
+#		[0,0,0,0,0,0,0,0,0,0],
+#		[0,0,0,0,0,0,0,0,0,0],
+#		[0,0,0,0,0,0,0,0,0,0],
+#		[0,0,0,0,0,0,0,0,0,0],
+#		[0,0,0,0,0,0,0,0,0,0],
+#		[0,0,0,0,0,0,0,0,0,0],
+#	]
+	
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+
 #	_spawn_shape(randi() % 7)
-	pass
+	# set up empty board, 1st four rows are NOT rendered
+	for row in range(ROWS):
+		board.append([])
+		for col in range(COLUMNS):
+			board[row].append([])
+			board[row][col] = {'value': 0, 'colour': 0}
 
 func _level_up():
 	print("LEVEL UP!!")
@@ -127,6 +145,11 @@ func _check_level_up():
 		
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
+	
+	if game_state == 0:
+	# draw title screen with start button
+		return
+	
 	queue_redraw()
 	
 	_check_level_up()
@@ -181,7 +204,7 @@ func _check_for_line():
 	var lines_to_wipe = []
 	for row in ROWS:
 		for col in COLUMNS:
-			if board[row][col] == 2:
+			if board[row][col]['value'] == 2:
 				if col == COLUMNS - 1:
 					lines_to_wipe.push_back(row)
 			else: 
@@ -194,7 +217,7 @@ func _check_for_line():
 func _wipe_lines(rows):
 	for row in rows:
 		for col in COLUMNS:
-			board[row][col] = 0
+			board[row][col]['value'] = 0
 			
 func _drop_lines(rows):
 	for row in rows:
@@ -203,17 +226,18 @@ func _drop_lines(rows):
 func _move_all_down(move_row):
 	for row in range(move_row -1, -1, -1):
 		for col in COLUMNS:
-			board[row+1][col] = board[row][col]
+			board[row+1][col]['value'] = board[row][col]['value']
+			board[row+1][col]['colour'] = board[row][col]['colour']
 			
 func _blank_line(rows):
 	for row in rows:
 		for col in COLUMNS:
-			board[row][col] = 0
+			board[row][col]['value'] = 0
 			
 func _unblank_line(rows):
 	for row in rows:
 		for col in COLUMNS:
-			board[row][col] = 2
+			board[row][col]['value'] = 2
 				
 func _flash_lines(rows, flash_type):
 	if flash_type == false:
@@ -235,7 +259,7 @@ func _draw():
 		draw_rect( Rect2(START_X, START_Y + (BLOCK_SIZE * STAGING), COLUMNS * BLOCK_SIZE, VISIBLE_ROWS * BLOCK_SIZE), GRID_BG, GRID_WIDTH)
 		draw_rect( Rect2(START_X, START_Y + (BLOCK_SIZE * STAGING), COLUMNS * BLOCK_SIZE, VISIBLE_ROWS * BLOCK_SIZE), GRID_COLOUR, false, GRID_WIDTH)
 		
-		if draw_grid:
+		if DEBUG:
 			# draw the column gridlines
 			for i in range(START_X , BLOCK_SIZE * COLUMNS + START_X + 1, BLOCK_SIZE):
 				draw_line( Vector2(i , START_Y + (BLOCK_SIZE * STAGING)), Vector2( i, ROWS * BLOCK_SIZE + START_Y), GRID_COLOUR, GRID_WIDTH)
@@ -250,7 +274,8 @@ func _draw():
 		# fill any squares in the board that != 0
 		for row in range(STAGING, ROWS):
 			for col in COLUMNS:
-				if board[row][col] != 0:
+				if board[row][col]['value'] != 0:
+					var _colour = SHAPE_COLOURS[board[row][col]['colour']]
 					var x = col * BLOCK_SIZE + START_X
 					var y = row * BLOCK_SIZE + START_Y
 					var width = BLOCK_SIZE
@@ -260,10 +285,10 @@ func _draw():
 					var rect_1 = Rect2(x, y, width - border_width, height - border_width)
 					var rect_2 = Rect2(x + step_down, y + step_down, width - (step_down * 2) - border_width, height - (step_down * 2) - border_width)
 					var rect_3 = Rect2(x + step_down_2, y + step_down_2, width - (step_down_2 * 2) - border_width, height - (step_down_2 * 2) - border_width)
-					draw_rect(rect_0, SQUARE_OUTLINE, false, 1)
-					draw_rect(rect_1, SQUARE_BG)
-					draw_rect(rect_2, SQUARE_FG)
-					draw_rect(rect_3, SQUARE_BG)
+					draw_rect(rect_0, _colour.lightened(0.4), false, 1)
+					draw_rect(rect_1, _colour.darkened(0.2)) # darker
+					draw_rect(rect_2, _colour.lightened(0.2)) # darker
+					draw_rect(rect_3, _colour.darkened(0.2)) # darker
 					
 		
 		# draw the next shape box
@@ -339,10 +364,10 @@ func _print_board():
 func _clear_board():
 	for row in ROWS:
 		for col in COLUMNS:
-			if board[row][col] == 2:
+			if board[row][col]['value'] == 2:
 				pass
 			else:
-				board[row][col] = 0
+				board[row][col]['value'] = 0
 				
 func _set_up_new_shape(new_shape, pos):
 	shape = new_shape.new()
@@ -388,15 +413,16 @@ func _place_shape(shape, value):
 			# add all current shape coords to an array for checking on collision
 			_set_shape_last_row_coords(shape, row, col, start_y, start_x)
 			if value == 2:
-				if shape.frames[shape.frame_index][row - start_y][col - start_x] == 1 or board[row][col] == 2:
-					board[row][col] = 2
+				if shape.frames[shape.frame_index][row - start_y][col - start_x] == 1 or board[row][col]['value'] == 2:
+					board[row][col]['value'] = 2
 				else: 
-					board[row][col] = 0
+					board[row][col]['value'] = 0
 			else:
-				if board[row][col] == 2:
+				if board[row][col]['value'] == 2:
 					pass
 				else:
-					board[row][col] = shape.frames[shape.frame_index][row - start_y][col - start_x]
+					board[row][col]['value'] = shape.frames[shape.frame_index][row - start_y][col - start_x]
+					board[row][col]['colour'] = shape.COLOUR
 
 # sets an array with all the coords of the shape's last row
 # use this to calc if it hits another block, ie to build the wall
@@ -411,6 +437,8 @@ func _on_shape_shape_is_set():
 	if shape.position.y < 4:
 		print("GAME OVER !!")
 		game_state = 2
+	if DEBUG:
+		_print_board()
 
 
 func _on_start_button_pressed():
