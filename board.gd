@@ -99,18 +99,19 @@ func _level_up():
 	print("LEVEL UP!!")
 
 func _input(event):
-	if event is InputEventKey and event.pressed and is_instance_valid(shape):
-		if event.keycode == KEY_SPACE or event.keycode == KEY_UP:
+	# ensure the shape is instanciated before we try and move it
+	if is_instance_valid(shape):
+		if event.is_action_pressed("rotate_l"):
 			shape.rotate(1)
-		if event.keycode == KEY_ALT:
+		if event.is_action_pressed("rotate_r"):
 			shape.rotate(-1)
-		if event.keycode == KEY_RIGHT:
+		if event.is_action_pressed("right"):
 			shape.move(1)
-		if event.keycode == KEY_LEFT:
+		if event.is_action_pressed("left"):
 			shape.move(-1)
-		if event.keycode == KEY_DOWN:
+		if event.is_action_pressed("down"):
 			time = 1000
-	if  event is InputEventKey and event.is_action_released("down"):
+	if event.is_action_released("down"):
 		time = 0
 
 func _check_level_up():

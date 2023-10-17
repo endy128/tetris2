@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://cjs2ouveo4emu"]
+[gd_scene load_steps=15 format=3 uid="uid://cjs2ouveo4emu"]
 
 [ext_resource type="Script" path="res://board.gd" id="1_qqn35"]
 [ext_resource type="Script" path="res://shape_o.gd" id="2_adk8f"]
@@ -13,12 +13,6 @@
 [ext_resource type="Texture2D" uid="uid://cn1uhx6npiwi1" path="res://icons/btn_up.png" id="11_s3vsn"]
 [ext_resource type="Texture2D" uid="uid://b2buq3ouwul5s" path="res://icons/btn_a.png" id="12_7wa6t"]
 [ext_resource type="Texture2D" uid="uid://dne8h6plrjmc1" path="res://icons/btn_b.png" id="13_i5c1x"]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_2r4bb"]
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_bjp2j"]
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_kq22c"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_6nacf"]
 
@@ -62,7 +56,6 @@ position = Vector2(8, 816)
 rotation = -1.5708
 scale = Vector2(2, 2)
 texture_normal = ExtResource("11_s3vsn")
-shape = SubResource("RectangleShape2D_2r4bb")
 action = "left"
 
 [node name="right" type="TouchScreenButton" parent="controls"]
@@ -70,7 +63,6 @@ position = Vector2(240, 720)
 rotation = 1.5708
 scale = Vector2(2, 2)
 texture_normal = ExtResource("11_s3vsn")
-shape = SubResource("RectangleShape2D_2r4bb")
 action = "right"
 
 [node name="down" type="TouchScreenButton" parent="controls"]
@@ -78,21 +70,18 @@ position = Vector2(176, 912)
 rotation = 3.14159
 scale = Vector2(2, 2)
 texture_normal = ExtResource("11_s3vsn")
-shape = SubResource("RectangleShape2D_2r4bb")
 action = "down"
 
 [node name="a" type="TouchScreenButton" parent="controls"]
 position = Vector2(256, 808)
 scale = Vector2(2, 2)
 texture_normal = ExtResource("12_7wa6t")
-shape = SubResource("CircleShape2D_bjp2j")
 action = "rotate_l"
 
 [node name="b" type="TouchScreenButton" parent="controls"]
 position = Vector2(304, 704)
 scale = Vector2(2, 2)
 texture_normal = ExtResource("13_i5c1x")
-shape = SubResource("CircleShape2D_kq22c")
 action = "rotate_r"
 
 [node name="start_button" type="Button" parent="controls"]
