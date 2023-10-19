@@ -441,6 +441,6 @@ func _on_shape_shape_is_set():
 		_print_board()
 
 
-func _on_start_button_pressed():
+func _on_touch_screen_button_pressed():
 	get_node("../controls/start_button").hide()
 	game_state = 1
