@@ -55,7 +55,10 @@ var game_state = 0
 var TETROMINO = {0: 'I', 1: 'J', 2: 'L',3: 'O',4: 'S',5: 'T',6: 'Z'}
 
 var next_shape = randi() % 7
+var next_shape_colour = randi() % len(SHAPE_COLOURS)
 var current_shape = null
+var current_shape_colour = null
+
 
 var shape
 var shape_array = []
@@ -166,6 +169,10 @@ func _process(delta):
 	# draw title screen with start button
 		return
 	
+	if game_state == 2:
+	# GAME OVER
+		return
+		
 	queue_redraw()
 	
 	_check_level_up()
@@ -208,8 +215,10 @@ func _process(delta):
 			is_flashing = true
 	elif not is_flashing:
 		current_shape = next_shape
+		current_shape_colour = next_shape_colour
 		next_shape = randi() % 7
-		_spawn_shape(current_shape)
+		next_shape_colour = randi() % len(SHAPE_COLOURS)
+		_spawn_shape(current_shape, current_shape_colour)
 #		_spawn_shape(0)
 		print("Next Shape: " + str(TETROMINO[next_shape]))
 
@@ -275,7 +284,7 @@ func _draw():
 		pass
 		
 	# game begins
-	if game_state == 1: 
+	if game_state == 1 or game_state == 2: # draw the board at game over
 		#draw the outline of the board
 		draw_rect( Rect2(START_X, START_Y + (BLOCK_SIZE * STAGING), COLUMNS * BLOCK_SIZE, VISIBLE_ROWS * BLOCK_SIZE), GRID_BG, GRID_WIDTH)
 		draw_rect( Rect2(START_X, START_Y + (BLOCK_SIZE * STAGING), COLUMNS * BLOCK_SIZE, VISIBLE_ROWS * BLOCK_SIZE), GRID_COLOUR, false, GRID_WIDTH)
@@ -339,6 +348,7 @@ func _draw():
 		for row in len(_next_shape):
 			for col in len(_next_shape[0]):
 				if _next_shape[row][col] == 1:
+					var _colour = SHAPE_COLOURS[next_shape_colour]
 					var x = col * BLOCK_SIZE + NEXT_SHAPE_X + _left_padding
 					var y = row * BLOCK_SIZE + NEXT_SHAPE_Y + _top_padding
 					var width = BLOCK_SIZE
@@ -347,10 +357,10 @@ func _draw():
 					var rect_1 = Rect2(x, y, width - border_width, height - border_width)
 					var rect_2 = Rect2(x + step_down, y + step_down, width - (step_down * 2) - border_width, height - (step_down * 2) - border_width)
 					var rect_3 = Rect2(x + step_down_2, y + step_down_2, width - (step_down_2 * 2) - border_width, height - (step_down_2 * 2) - border_width)
-					draw_rect(rect_0, SQUARE_OUTLINE, false, 1)
-					draw_rect(rect_1, SQUARE_BG)
-					draw_rect(rect_2, SQUARE_FG)
-					draw_rect(rect_3, SQUARE_BG)
+					draw_rect(rect_0, _colour.lightened(0.4), false, 1)
+					draw_rect(rect_1, _colour.darkened(0.2)) # darker
+					draw_rect(rect_2, _colour.lightened(0.2)) # darker
+					draw_rect(rect_3, _colour.darkened(0.2)) # darker
 	
 func _get_next_shape_matrix(next_shape):
 	match (next_shape):
@@ -390,36 +400,37 @@ func _clear_board():
 			else:
 				board[row][col]['value'] = 0
 				
-func _set_up_new_shape(new_shape, pos):
+func _set_up_new_shape(new_shape, pos, colour):
 	shape = new_shape.new()
 	shape.shape_is_set.connect(_on_shape_shape_is_set)
 	shape.my_board = board.duplicate()
 	# amend the start y position if the shape is smaller than the 'i' piece
 	shape.position = {'x': 4, "y": pos}
+	shape.COLOUR = colour
 
-func _spawn_shape(num):
+func _spawn_shape(num, colour):
 	match (num):
 		0:
 			var new_shape = preload("res://shape_i.gd")
-			_set_up_new_shape(new_shape, 0)
+			_set_up_new_shape(new_shape, 0, colour)
 		1:
 			var new_shape = preload("res://shape_j.gd")
-			_set_up_new_shape(new_shape, 1)
+			_set_up_new_shape(new_shape, 1, colour)
 		2:
 			var new_shape = preload("res://shape_l.gd")
-			_set_up_new_shape(new_shape, 1)
+			_set_up_new_shape(new_shape, 1, colour)
 		3:
 			var new_shape = preload("res://shape_o.gd")
-			_set_up_new_shape(new_shape, 2)
+			_set_up_new_shape(new_shape, 2, colour)
 		4:
 			var new_shape = preload("res://shape_s.gd")
-			_set_up_new_shape(new_shape, 1)
+			_set_up_new_shape(new_shape, 1, colour)
 		5:
 			var new_shape = preload("res://shape_t.gd")
-			_set_up_new_shape(new_shape, 1)
+			_set_up_new_shape(new_shape, 1, colour)
 		6:
 			var new_shape = preload("res://shape_z.gd")
-			_set_up_new_shape(new_shape, 1)
+			_set_up_new_shape(new_shape, 1, colour)
 			
 	_place_shape(shape, shape.is_set)
 	
