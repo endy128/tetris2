@@ -3,11 +3,11 @@ extends Node2D
 const DEBUG = 0
 
 var SHAPE_COLOURS = {
-	0: Color.html('#264d73'),
-	1: Color.html('#732626'), 
-	2: Color.html('#732639'), 
-	3: Color.html('#737326'),
-	4: Color.html('#607326'),
+	0: Color.html('#004d99'),
+	1: Color.html('#4d0099'), 
+	2: Color.html('#994d00'), 
+	3: Color.html('#4d9900'),
+	4: Color.html('#99004d'),
 }
 
 
@@ -300,6 +300,7 @@ func _draw():
 		const border_width = 1
 		const step_down = 4
 		const step_down_2 = step_down * 2
+		const step_down_3 = step_down_2 * 2
 			
 		# fill any squares in the board that != 0
 		for row in range(STAGING, ROWS):
@@ -315,10 +316,13 @@ func _draw():
 					var rect_1 = Rect2(x, y, width - border_width, height - border_width)
 					var rect_2 = Rect2(x + step_down, y + step_down, width - (step_down * 2) - border_width, height - (step_down * 2) - border_width)
 					var rect_3 = Rect2(x + step_down_2, y + step_down_2, width - (step_down_2 * 2) - border_width, height - (step_down_2 * 2) - border_width)
+					var rect_4 = Rect2(x + step_down_3, y + step_down_3, width - (step_down_3 * 2) - border_width, height - (step_down_3 * 2) - border_width)
 					draw_rect(rect_0, _colour.lightened(0.4), false, 1)
 					draw_rect(rect_1, _colour.darkened(0.2)) # darker
 					draw_rect(rect_2, _colour.lightened(0.2)) # darker
 					draw_rect(rect_3, _colour.darkened(0.2)) # darker
+					draw_rect(rect_4, _colour.lightened(0.2)) # darker
+					
 					
 		
 		# draw the next shape box
@@ -357,10 +361,13 @@ func _draw():
 					var rect_1 = Rect2(x, y, width - border_width, height - border_width)
 					var rect_2 = Rect2(x + step_down, y + step_down, width - (step_down * 2) - border_width, height - (step_down * 2) - border_width)
 					var rect_3 = Rect2(x + step_down_2, y + step_down_2, width - (step_down_2 * 2) - border_width, height - (step_down_2 * 2) - border_width)
+					var rect_4 = Rect2(x + step_down_3, y + step_down_3, width - (step_down_3 * 2) - border_width, height - (step_down_3 * 2) - border_width)
 					draw_rect(rect_0, _colour.lightened(0.4), false, 1)
 					draw_rect(rect_1, _colour.darkened(0.2)) # darker
-					draw_rect(rect_2, _colour.lightened(0.2)) # darker
+					draw_rect(rect_2, _colour.lightened(0.2)) # lighter
 					draw_rect(rect_3, _colour.darkened(0.2)) # darker
+					draw_rect(rect_4, _colour.lightened(0.2)) # lighter
+					
 	
 func _get_next_shape_matrix(next_shape):
 	match (next_shape):
