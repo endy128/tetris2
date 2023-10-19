@@ -10,6 +10,7 @@ var SHAPE_COLOURS = {
 	4: Color.html('#607326'),
 }
 
+
 const COLUMNS = 10
 const ROWS = 24
 const STAGING = 4
@@ -60,9 +61,12 @@ var shape
 var shape_array = []
 
 # GAME SPEED
-var accel = 0.0005
+#var accel = 0.0005 # not needed ad levels increase the speed
 var speed = 10  # 50
 var time = 0
+var btn_repeat_time = 0
+const BTN_REPEAT_DELAY = -5
+const BTN_REPEAT_THRESHOLD = 0.25
 
 # When a line is full, control the flashes
 var flash_type = false
@@ -71,6 +75,8 @@ var lines = false
 
 var default_font = ThemeDB.fallback_font
 var default_font_size = ThemeDB.fallback_font_size
+
+var movement = 0
 
 var board = []
 #var board = [
@@ -104,7 +110,6 @@ var board = []
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-
 #	_spawn_shape(randi() % 7)
 	# set up empty board, 1st four rows are NOT rendered
 	for row in range(ROWS):
@@ -124,13 +129,24 @@ func _input(event):
 		if event.is_action_pressed("rotate_r"):
 			shape.rotate(-1)
 		if event.is_action_pressed("right"):
+			btn_repeat_time = BTN_REPEAT_DELAY
 			shape.move(1)
+			movement = 1
 		if event.is_action_pressed("left"):
+			btn_repeat_time = BTN_REPEAT_DELAY
 			shape.move(-1)
+			movement = -1
 		if event.is_action_pressed("down"):
 			time = 1000
 	if event.is_action_released("down"):
 		time = 0
+	if event.is_action_released("left"):
+		movement = 0
+		btn_repeat_time = 0
+	if event.is_action_released("right"):
+		movement = 0
+		btn_repeat_time = 0
+		
 
 func _check_level_up():
 	if score >= (level * 1000):
@@ -156,8 +172,6 @@ func _process(delta):
 	
 	
 	if is_flashing:
-		# dont need accel as the levels up the speed
-#		speed += accel
 		time += speed * delta
 		if time > FLASH_SPEED:
 			time = 0
@@ -173,8 +187,15 @@ func _process(delta):
 				
 	
 	if is_instance_valid(shape) and not is_flashing:  # check the shape has not been destroyed
-		# dont need accel as the levels up the speed
-#		speed += accel
+		
+		# repeat movement if button is being held
+		btn_repeat_time += 10 * delta
+		if movement != 0 and btn_repeat_time > BTN_REPEAT_THRESHOLD:
+			shape.move(movement)
+			btn_repeat_time = 0
+			
+
+			
 		time += speed * delta
 		if time > 10:
 			if time < 1000:
