@@ -30,8 +30,14 @@ const GAP = 5
 const NEXT_SHAPE_X = (COLUMNS * BLOCK_SIZE) + START_X + GAP
 const NEXT_SHAPE_Y = START_Y + (BLOCK_SIZE * STAGING)
 
-const SCORE_BOX_X = (COLUMNS * BLOCK_SIZE) + START_X + GAP
-const SCORE_BOX_Y = START_Y + (BLOCK_SIZE * STAGING) + GAP + (5 * BLOCK_SIZE)
+const SCORE_BOX_X = NEXT_SHAPE_X
+const SCORE_BOX_Y = NEXT_SHAPE_Y + GAP + (5 * BLOCK_SIZE)
+
+const LEVEL_BOX_X = NEXT_SHAPE_X
+const LEVEL_BOX_Y = SCORE_BOX_Y + GAP + (2 * BLOCK_SIZE)
+
+const LINES_BOX_X = NEXT_SHAPE_X
+const LINES_BOX_Y = LEVEL_BOX_Y + GAP + (2 * BLOCK_SIZE)
 
 const FLASHES = 5
 const FLASH_SPEED = 1
@@ -47,6 +53,8 @@ var level = 0
 const LEVEL_INCREASE = 10
 const LEVEL_MAX = 200
 const LEVEL_ROLLOVER = 100
+
+var lines_complete = 0
 
 
 # 0: pre-game, 1: play, 2: game over, 3: credits
@@ -226,6 +234,8 @@ func _add_score(points, type):
 	if (points == 4):
 		score += SCORE_BONUS
 		print("BONUS: " + str(SCORE_BONUS))
+	if type == SCORE_LINE:
+		lines_complete += points
 	score += points * type
 	print("SCORE: " + str(score))
 
@@ -330,16 +340,31 @@ func _draw():
 		draw_rect(Rect2(NEXT_SHAPE_X, NEXT_SHAPE_Y, 3 * BLOCK_SIZE, 5 * BLOCK_SIZE), GRID_COLOUR, false, GRID_WIDTH)
 		
 		# draw the score box
-		draw_rect(Rect2(SCORE_BOX_X, SCORE_BOX_Y, 3 * BLOCK_SIZE, 3 * BLOCK_SIZE), GRID_BG, GRID_WIDTH)
-		draw_rect(Rect2(SCORE_BOX_X, SCORE_BOX_Y, 3 * BLOCK_SIZE, 3 * BLOCK_SIZE), GRID_COLOUR, false, GRID_WIDTH)
+		draw_rect(Rect2(SCORE_BOX_X, SCORE_BOX_Y, 3 * BLOCK_SIZE, 2 * BLOCK_SIZE), GRID_BG, GRID_WIDTH)
+		draw_rect(Rect2(SCORE_BOX_X, SCORE_BOX_Y, 3 * BLOCK_SIZE, 2 * BLOCK_SIZE), GRID_COLOUR, false, GRID_WIDTH)
 		
-		# draw the level text
-		draw_string(default_font, Vector2(SCORE_BOX_X + 5, SCORE_BOX_Y + 20), "LEVEL:", HORIZONTAL_ALIGNMENT_LEFT, -1, 14)
-		draw_string(default_font, Vector2(SCORE_BOX_X + (1.5 * BLOCK_SIZE), SCORE_BOX_Y + 40), str(level), HORIZONTAL_ALIGNMENT_LEFT, -1, 14)
+		# draw the level box
+		draw_rect(Rect2(LEVEL_BOX_X, LEVEL_BOX_Y, 3 * BLOCK_SIZE, 2 * BLOCK_SIZE), GRID_BG, GRID_WIDTH)
+		draw_rect(Rect2(LEVEL_BOX_X, LEVEL_BOX_Y, 3 * BLOCK_SIZE, 2 * BLOCK_SIZE), GRID_COLOUR, false, GRID_WIDTH)
+		
+		# draw the lines box
+		draw_rect(Rect2(LINES_BOX_X, LINES_BOX_Y, 3 * BLOCK_SIZE, 2 * BLOCK_SIZE), GRID_BG, GRID_WIDTH)
+		draw_rect(Rect2(LINES_BOX_X, LINES_BOX_Y, 3 * BLOCK_SIZE, 2 * BLOCK_SIZE), GRID_COLOUR, false, GRID_WIDTH)
 		
 		# draw the Score text
-		draw_string(default_font, Vector2(SCORE_BOX_X + 5, SCORE_BOX_Y + 60), "SCORE:", HORIZONTAL_ALIGNMENT_LEFT, -1, 14)
-		draw_string(default_font, Vector2(SCORE_BOX_X + 5, SCORE_BOX_Y + 80), "%010d" % score, HORIZONTAL_ALIGNMENT_LEFT, -1, 14)
+		draw_string(default_font, Vector2(SCORE_BOX_X + 5, SCORE_BOX_Y + 25), "SCORE:", HORIZONTAL_ALIGNMENT_LEFT, -1, 14)
+		draw_string(default_font, Vector2(SCORE_BOX_X + 5, SCORE_BOX_Y + 45), "%010d" % score, HORIZONTAL_ALIGNMENT_LEFT, -1, 14)
+		
+		# draw the level text
+		draw_string(default_font, Vector2(LEVEL_BOX_X + 5, LEVEL_BOX_Y + 25), "LEVEL:", HORIZONTAL_ALIGNMENT_LEFT, -1, 14)
+		draw_string(default_font, Vector2(LEVEL_BOX_X + (1.5 * BLOCK_SIZE), LEVEL_BOX_Y + 45), str(level), HORIZONTAL_ALIGNMENT_LEFT, -1, 14)
+		
+		draw_string(default_font, Vector2(LINES_BOX_X + 5, LINES_BOX_Y + 25), "LINES:", HORIZONTAL_ALIGNMENT_LEFT, -1, 14)
+		draw_string(default_font, Vector2(LINES_BOX_X + (1.5 * BLOCK_SIZE), LINES_BOX_Y + 45), str(lines_complete), HORIZONTAL_ALIGNMENT_LEFT, -1, 14)
+		
+		# score
+		# level
+		# lines
 		
 		# draw the next shape in the box
 		var _next_shape = _get_next_shape_matrix(next_shape)
