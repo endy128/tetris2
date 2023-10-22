@@ -14,7 +14,7 @@ var SHAPE_COLOURS = {
 const COLUMNS = 10
 const ROWS = 24
 const STAGING = 4
-const VISIBLE_ROWS = STAGING - ROWS
+const VISIBLE_ROWS = ROWS - STAGING
 const BLOCK_SIZE = 30
 const GRID_WIDTH = 1
 const START_X = 10
@@ -84,7 +84,7 @@ var lines = false
 var default_font = ThemeDB.fallback_font
 var default_font_size = ThemeDB.fallback_font_size
 
-# to handle L/R buttons being held down for auto repeat
+# to handle L/R itr abuttons being held down for auto repeat
 var movement = 0
 
 # create the full array in the _ready function
