@@ -18,7 +18,7 @@ const VISIBLE_ROWS = 20
 const BLOCK_SIZE = 30
 const GRID_WIDTH = 1
 const START_X = 10
-const START_Y = 0
+const START_Y = (4 * - BLOCK_SIZE) + 10
 const GRID_BG = "#000000"
 const GRID_COLOUR = "#FFFFFF"
 
@@ -89,45 +89,33 @@ var default_font_size = ThemeDB.fallback_font_size
 
 var movement = 0
 
+# create the full array in the _ready function
 var board = []
-#var board = [
-#		[0,0,0,0,0,0,0,0,0,0], # staginng, not drawn
-#		[0,0,0,0,0,0,0,0,0,0], # staginng, not drawn
-#		[0,0,0,0,0,0,0,0,0,0], # staginng, not drawn
-#		[0,0,0,0,0,0,0,0,0,0], # staginng, not drawn
-#		[0,0,0,0,0,0,0,0,0,0],
-#		[0,0,0,0,0,0,0,0,0,0],
-#		[0,0,0,0,0,0,0,0,0,0],
-#		[0,0,0,0,0,0,0,0,0,0],
-#		[0,0,0,0,0,0,0,0,0,0],
-#		[0,0,0,0,0,0,0,0,0,0],
-#		[0,0,0,0,0,0,0,0,0,0],
-#		[0,0,0,0,0,0,0,0,0,0],
-#		[0,0,0,0,0,0,0,0,0,0],
-#		[0,0,0,0,0,0,0,0,0,0],
-#		[0,0,0,0,0,0,0,0,0,0],
-#		[0,0,0,0,0,0,0,0,0,0],
-#		[0,0,0,0,0,0,0,0,0,0],
-#		[0,0,0,0,0,0,0,0,0,0],
-#		[0,0,0,0,0,0,0,0,0,0],
-#		[0,0,0,0,0,0,0,0,0,0],
-#		[0,0,0,0,0,0,0,0,0,0],
-#		[0,0,0,0,0,0,0,0,0,0],
-#		[0,0,0,0,0,0,0,0,0,0],
-#		[0,0,0,0,0,0,0,0,0,0],
-#	]
-	
 
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-#	_spawn_shape(randi() % 7)
+	pass
+
+func game_over():
+	await get_tree().create_timer(2.0).timeout
+	get_node("../controls/start_button").show()
+	pass
+	
+
+func reset_game():
 	# set up empty board, 1st four rows are NOT rendered
 	for row in range(ROWS):
 		board.append([])
 		for col in range(COLUMNS):
 			board[row].append([])
 			board[row][col] = {'value': 0, 'colour': 0}
+	speed = 10
+	time = 0
+	level = 0 
+	lines_complete = 0
+	score = 0
+	
 
 func _level_up():
 	print("LEVEL UP!!")
@@ -362,9 +350,11 @@ func _draw():
 		draw_string(default_font, Vector2(LINES_BOX_X + 5, LINES_BOX_Y + 25), "LINES:", HORIZONTAL_ALIGNMENT_LEFT, -1, 14)
 		draw_string(default_font, Vector2(LINES_BOX_X + (1.5 * BLOCK_SIZE), LINES_BOX_Y + 45), str(lines_complete), HORIZONTAL_ALIGNMENT_LEFT, -1, 14)
 		
-		# score
-		# level
-		# lines
+		# draw the game over text
+		if game_state == 2:
+			draw_string(default_font, Vector2(LINES_BOX_X + 2.5, LINES_BOX_Y + 85), "GAME OVER!", HORIZONTAL_ALIGNMENT_CENTER, -1, 14)
+		
+		
 		
 		# draw the next shape in the box
 		var _next_shape = _get_next_shape_matrix(next_shape)
@@ -501,10 +491,12 @@ func _on_shape_shape_is_set():
 	if shape.position.y < 4:
 		print("GAME OVER !!")
 		game_state = 2
+		game_over()
 	if DEBUG:
 		_print_board()
 
 
 func _on_touch_screen_button_pressed():
 	get_node("../controls/start_button").hide()
+	reset_game()
 	game_state = 1
