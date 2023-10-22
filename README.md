@@ -16,6 +16,7 @@ I chose to represent the board in a 2d array and then render the game by the `_d
 - [ ] Add options menu
 - [ ] Add sound fx and music
 - [ ] add pause function
+- [ ] Use `signals` to set up node variables and use `get_node` in other nodes when `signal` is emitted
 
 ## Notes:
 
