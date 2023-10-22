@@ -10,22 +10,19 @@ var SHAPE_COLOURS = {
 	4: Color.html('#99004d'),
 }
 
-
+# playing board connstants
 const COLUMNS = 10
 const ROWS = 24
 const STAGING = 4
-const VISIBLE_ROWS = 20
+const VISIBLE_ROWS = STAGING - ROWS
 const BLOCK_SIZE = 30
 const GRID_WIDTH = 1
 const START_X = 10
-const START_Y = (4 * - BLOCK_SIZE) + 10
+const START_Y = (4 * - BLOCK_SIZE) + 10  # move the board up as staging area isn't rendrerd
 const GRID_BG = "#000000"
 const GRID_COLOUR = "#FFFFFF"
 
-const SQUARE_OUTLINE = "#ffffff"
-const SQUARE_BG = "#808080"
-const SQUARE_FG = "#d9d9d9"
-
+# score, level and lines extra boxes
 const GAP = 5
 const NEXT_SHAPE_X = (COLUMNS * BLOCK_SIZE) + START_X + GAP
 const NEXT_SHAPE_Y = START_Y + (BLOCK_SIZE * STAGING)
@@ -39,24 +36,20 @@ const LEVEL_BOX_Y = SCORE_BOX_Y + GAP + (2 * BLOCK_SIZE)
 const LINES_BOX_X = NEXT_SHAPE_X
 const LINES_BOX_Y = LEVEL_BOX_Y + GAP + (2 * BLOCK_SIZE)
 
-const FLASHES = 5
-const FLASH_SPEED = 1
-var is_flashing = false
-
-# points for placing shape and clearing a line & tetris
+# points for placing shape and clearing a line & 5 line in one go bonus
 var score = 0
+var lines_complete = 0
 const SCORE_PLACE = 10
 const SCORE_LINE = 100
 const SCORE_BONUS = 500
 
+# how the speed and levels increase
 var level = 0
 const LEVEL_INCREASE = 10
 const LEVEL_MAX = 200
 const LEVEL_ROLLOVER = 100
 
-var lines_complete = 0
-
-
+# game state
 # 0: pre-game, 1: play, 2: game over, 3: credits
 var game_state = 0
 
@@ -72,12 +65,16 @@ var shape
 var shape_array = []
 
 # GAME SPEED
-#var accel = 0.0005 # not needed ad levels increase the speed
 var speed = 10  # 50
 var time = 0
 var btn_repeat_time = 0
 const BTN_REPEAT_DELAY = -5
 const BTN_REPEAT_THRESHOLD = 0.25
+
+# flashing linnes
+const FLASHES = 5
+const FLASH_SPEED = 1
+var is_flashing = false
 
 # When a line is full, control the flashes
 var flash_type = false
@@ -87,6 +84,7 @@ var lines = false
 var default_font = ThemeDB.fallback_font
 var default_font_size = ThemeDB.fallback_font_size
 
+# to handle L/R buttons being held down for auto repeat
 var movement = 0
 
 # create the full array in the _ready function
