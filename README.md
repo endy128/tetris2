@@ -2,6 +2,8 @@
 
 I chose to represent the board in a 2d array and then render the game by the `_draw` function.
 
+![screenshot](./screenshot.png)
+
 ## TODO:
 - [x] Fix shape rotating over other pieces :heavy_check_mark:
 - [ ] ~~Shapes to 'bump' left or right if at the edge of play area and rotation will push them out of bounds~~ - not done, tetris doesn't do this
