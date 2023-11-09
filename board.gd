@@ -18,7 +18,7 @@ const VISIBLE_ROWS = ROWS - STAGING
 const BLOCK_SIZE = 30
 const GRID_WIDTH = 1
 const START_X = 10
-const START_Y = (4 * - BLOCK_SIZE) + 10  # move the board up as staging area isn't rendrerd
+const START_Y = (4 * - BLOCK_SIZE) + 70  # move the board up as staging area isn't rendrerd
 const GRID_BG = "#000000"
 const GRID_COLOUR = "#FFFFFF"
 
@@ -281,9 +281,12 @@ func _draw():
 		
 	# game begins
 	if game_state == 1 or game_state == 2: # draw the board at game over
-		#draw the outline of the board
+		
+		#draw the board background
 		draw_rect( Rect2(START_X, START_Y + (BLOCK_SIZE * STAGING), COLUMNS * BLOCK_SIZE, VISIBLE_ROWS * BLOCK_SIZE), GRID_BG, GRID_WIDTH)
-		draw_rect( Rect2(START_X, START_Y + (BLOCK_SIZE * STAGING), COLUMNS * BLOCK_SIZE, VISIBLE_ROWS * BLOCK_SIZE), GRID_COLOUR, false, GRID_WIDTH)
+		
+		# draw outline later
+#		draw_rect( Rect2(START_X, START_Y + (BLOCK_SIZE * STAGING), COLUMNS * BLOCK_SIZE, VISIBLE_ROWS * BLOCK_SIZE), GRID_COLOUR, false, GRID_WIDTH)
 		
 		if DEBUG:
 			# draw the column gridlines
@@ -348,12 +351,13 @@ func _draw():
 		draw_string(default_font, Vector2(LINES_BOX_X + 5, LINES_BOX_Y + 25), "LINES:", HORIZONTAL_ALIGNMENT_LEFT, -1, 14)
 		draw_string(default_font, Vector2(LINES_BOX_X + (1.5 * BLOCK_SIZE), LINES_BOX_Y + 45), str(lines_complete), HORIZONTAL_ALIGNMENT_LEFT, -1, 14)
 		
+		# draw the board outline last
+		draw_rect( Rect2(START_X, START_Y + (BLOCK_SIZE * STAGING), COLUMNS * BLOCK_SIZE, VISIBLE_ROWS * BLOCK_SIZE), GRID_COLOUR, false, GRID_WIDTH)
+		
 		# draw the game over text
 		if game_state == 2:
 			draw_string(default_font, Vector2(LINES_BOX_X + 2.5, LINES_BOX_Y + 85), "GAME OVER!", HORIZONTAL_ALIGNMENT_CENTER, -1, 14)
-		
-		
-		
+	
 		# draw the next shape in the box
 		var _next_shape = _get_next_shape_matrix(next_shape)
 		var _top_padding = BLOCK_SIZE
