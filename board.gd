@@ -90,6 +90,8 @@ var movement = 0
 # create the full array in the _ready function
 var board = []
 
+# intro switch
+var intro_old_state = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -156,11 +158,22 @@ func _check_level_up():
 		if speed > LEVEL_MAX:
 			speed = LEVEL_ROLLOVER
 		
+func _play_intro(state):
+	var new_state = state
+	if new_state != intro_old_state:
+		intro_old_state = new_state
+		if new_state:
+			$intro.play()
+		else:
+			$intro.stop()
+	return
+
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	
 	if game_state == 0:
 	# draw title screen with start button
+		_play_intro(true)
 		return
 	
 	if game_state == 2:
@@ -220,6 +233,7 @@ func _add_score(points, type):
 	if (points == 4):
 		score += SCORE_BONUS
 		print("BONUS: " + str(SCORE_BONUS))
+		$bonus.play()
 	if type == SCORE_LINE:
 		lines_complete += points
 	score += points * type
@@ -502,3 +516,4 @@ func _on_touch_screen_button_pressed():
 	get_node("../controls/start_button").hide()
 	reset_game()
 	game_state = 1
+	_play_intro(false)

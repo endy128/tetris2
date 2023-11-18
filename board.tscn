@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://cjs2ouveo4emu"]
+[gd_scene load_steps=18 format=3 uid="uid://cjs2ouveo4emu"]
 
 [ext_resource type="Script" path="res://board.gd" id="1_qqn35"]
 [ext_resource type="Script" path="res://shape_o.gd" id="2_adk8f"]
@@ -9,7 +9,9 @@
 [ext_resource type="Script" path="res://shape_z.gd" id="6_3oxne"]
 [ext_resource type="Script" path="res://shape_i.gd" id="7_thnun"]
 [ext_resource type="Script" path="res://shape_t.gd" id="8_gh33y"]
+[ext_resource type="AudioStream" uid="uid://80c4bfsgkgs5" path="res://sfx/t_bonus.wav" id="10_gntdt"]
 [ext_resource type="Script" path="res://controls.gd" id="10_ocroq"]
+[ext_resource type="AudioStream" uid="uid://5o51trc3qgxk" path="res://sfx/t_intro.wav" id="11_4y54y"]
 [ext_resource type="Texture2D" uid="uid://cn1uhx6npiwi1" path="res://icons/btn_up.png" id="11_s3vsn"]
 [ext_resource type="Texture2D" uid="uid://b2buq3ouwul5s" path="res://icons/btn_a.png" id="12_7wa6t"]
 [ext_resource type="Texture2D" uid="uid://dne8h6plrjmc1" path="res://icons/btn_b.png" id="13_i5c1x"]
@@ -49,6 +51,12 @@ position = Vector2(206, 457)
 
 [node name="board" type="Node2D" parent="."]
 script = ExtResource("1_qqn35")
+
+[node name="bonus" type="AudioStreamPlayer2D" parent="board"]
+stream = ExtResource("10_gntdt")
+
+[node name="intro" type="AudioStreamPlayer2D" parent="board"]
+stream = ExtResource("11_4y54y")
 
 [node name="controls" type="CanvasLayer" parent="."]
 script = ExtResource("10_ocroq")
