@@ -233,7 +233,6 @@ func _add_score(points, type):
 	if (points == 4):
 		score += SCORE_BONUS
 		print("BONUS: " + str(SCORE_BONUS))
-		$bonus.play()
 	if type == SCORE_LINE:
 		lines_complete += points
 	score += points * type
@@ -252,6 +251,7 @@ func _check_for_line():
 	if lines_to_wipe.is_empty():
 		return false
 	else:
+		$bonus.play()
 		return lines_to_wipe
 		
 func _wipe_lines(rows):
@@ -507,6 +507,7 @@ func _on_shape_shape_is_set():
 	if shape.position.y < 4:
 		print("GAME OVER !!")
 		game_state = 2
+		$end_game.play()
 		game_over()
 	if DEBUG:
 		_print_board()
@@ -515,5 +516,6 @@ func _on_shape_shape_is_set():
 func _on_touch_screen_button_pressed():
 	get_node("../controls/start_button").hide()
 	reset_game()
+	$end_game.stop()
 	game_state = 1
 	_play_intro(false)
