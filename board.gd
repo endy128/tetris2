@@ -1,5 +1,7 @@
 extends Node2D
 
+signal board_ready 
+
 const DEBUG = 0
 
 var SHAPE_COLOURS = {
@@ -93,8 +95,12 @@ var board = []
 # intro switch
 var intro_old_state = false
 
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	print("COL: ", + COLUMNS)
+	print("ROW: ", + ROWS)
+	board_ready.emit()
 	pass
 
 func game_over():

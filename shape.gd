@@ -111,4 +111,3 @@ func _check_if_can_rotate(direction):
 		return false
 	else:
 		return true
-

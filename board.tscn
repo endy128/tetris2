@@ -98,4 +98,5 @@ position = Vector2(32, 432)
 texture_normal = ExtResource("14_1c13p")
 shape = SubResource("RectangleShape2D_6nacf")
 
+[connection signal="board_ready" from="board" to="shape" method="_on_board_ready"]
 [connection signal="pressed" from="controls/start_button" to="board" method="_on_touch_screen_button_pressed"]

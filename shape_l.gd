@@ -24,4 +24,3 @@ var frame_4 = [
 
 var frames = [frame_1, frame_2, frame_3, frame_4]
 var frame_index = 0
-

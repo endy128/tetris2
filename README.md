@@ -23,5 +23,3 @@ I chose to represent the board in a 2d array and then render the game by the `_d
 - [ ] Add up arrow (full D-pad) so menus can be used
 
 ## Notes:
-
-

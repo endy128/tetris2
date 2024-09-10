@@ -7,4 +7,3 @@ var frame_1 = [
 
 var frames = [frame_1]
 var frame_index = 0
-
