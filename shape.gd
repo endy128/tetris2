@@ -1,7 +1,7 @@
 extends Node
 class_name Shape
-const _ROWS = preload("res://board.gd").ROWS
-const _COLUMNS = preload("res://board.gd").COLUMNS
+const _ROWS = Global.ROWS
+const _COLUMNS = Global.COLUMNS
 var COLOUR = randi() % 5
 var my_board
 var is_active = true

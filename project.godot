@@ -15,10 +15,14 @@ run/main_scene="res://board.tscn"
 config/features=PackedStringArray("4.3", "Mobile")
 config/icon="res://icon.svg"
 
+[autoload]
+
+Global="*res://global.gd"
+
 [display]
 
-window/size/viewport_width=412
-window/size/viewport_height=914
+window/size/viewport_width=390
+window/size/viewport_height=850
 window/stretch/mode="viewport"
 window/stretch/aspect="expand"
 window/stretch/scale_mode="integer"

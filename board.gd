@@ -13,30 +13,30 @@ var SHAPE_COLOURS = {
 }
 
 # playing board connstants
-const COLUMNS = 10
-const ROWS = 24
-const STAGING = 4
+const COLUMNS = Global.COLUMNS
+const ROWS = Global.ROWS
+const STAGING = Global.STAGING
 const VISIBLE_ROWS = ROWS - STAGING
-const BLOCK_SIZE = 30
-const GRID_WIDTH = 1
-const START_X = 10
-const START_Y = (4 * - BLOCK_SIZE) + 70  # move the board up as staging area isn't rendrerd
-const GRID_BG = "#000000"
-const GRID_COLOUR = "#FFFFFF"
+var BLOCK_SIZE = Global.BLOCK_SIZE
+const GRID_WIDTH = Global.GRID_WIDTH
+const START_X = Global.START_X
+var START_Y = Global.START_Y
+const GRID_BG = Global.GRID_BG
+const GRID_COLOUR = Global.GRID_COLOUR
 
 # score, level and lines extra boxes
-const GAP = 5
-const NEXT_SHAPE_X = (COLUMNS * BLOCK_SIZE) + START_X + GAP
-const NEXT_SHAPE_Y = START_Y + (BLOCK_SIZE * STAGING)
+const GAP = Global.GAP
+var NEXT_SHAPE_X = (COLUMNS * BLOCK_SIZE) + START_X + GAP
+var NEXT_SHAPE_Y = START_Y + (BLOCK_SIZE * STAGING)
 
-const SCORE_BOX_X = NEXT_SHAPE_X
-const SCORE_BOX_Y = NEXT_SHAPE_Y + GAP + (5 * BLOCK_SIZE)
+var SCORE_BOX_X = NEXT_SHAPE_X
+var SCORE_BOX_Y = NEXT_SHAPE_Y + GAP + (5 * BLOCK_SIZE)
 
-const LEVEL_BOX_X = NEXT_SHAPE_X
-const LEVEL_BOX_Y = SCORE_BOX_Y + GAP + (2 * BLOCK_SIZE)
+var LEVEL_BOX_X = NEXT_SHAPE_X
+var LEVEL_BOX_Y = SCORE_BOX_Y + GAP + (2 * BLOCK_SIZE)
 
-const LINES_BOX_X = NEXT_SHAPE_X
-const LINES_BOX_Y = LEVEL_BOX_Y + GAP + (2 * BLOCK_SIZE)
+var LINES_BOX_X = NEXT_SHAPE_X
+var LINES_BOX_Y = LEVEL_BOX_Y + GAP + (2 * BLOCK_SIZE)
 
 # points for placing shape and clearing a line & 5 line in one go bonus
 var score = 0
@@ -362,7 +362,7 @@ func _draw():
 		
 		# draw the Score text
 		draw_string(default_font, Vector2(SCORE_BOX_X + 5, SCORE_BOX_Y + 25), "SCORE:", HORIZONTAL_ALIGNMENT_LEFT, -1, 14)
-		draw_string(default_font, Vector2(SCORE_BOX_X + 5, SCORE_BOX_Y + 45), "%010d" % score, HORIZONTAL_ALIGNMENT_LEFT, -1, 14)
+		draw_string(default_font, Vector2(SCORE_BOX_X + 5, SCORE_BOX_Y + 45), "%09d" % score, HORIZONTAL_ALIGNMENT_LEFT, -1, 14)
 		
 		# draw the level text
 		draw_string(default_font, Vector2(LEVEL_BOX_X + 5, LEVEL_BOX_Y + 25), "LEVEL:", HORIZONTAL_ALIGNMENT_LEFT, -1, 14)
