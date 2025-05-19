@@ -2,6 +2,11 @@
 
 I chose to represent the board in a 2d array and then render the game by the `_draw` function.
 
+Everything is created and rendered in GD Script code, I didn't use the Godot GUI for anything unless necessary. 
+
+I also created two very simple music tracks using [MilkeyTracker](https://milkytracker.org/) which is a modern Mod tracker, like those used in the 90's for game music, the demo scene and some raves (I'd imagine). Find loads of other (much better) mods on [modland.com](https://modland.com/)
+
+
 ![screenshot](./screenshot.png)
 
 ## TODO:
@@ -19,7 +24,7 @@ I chose to represent the board in a 2d array and then render the game by the `_d
 - [ ] Add sound fx and music
 - [ ] add pause function
 - [ ] Use `signals` to set up node variables and use `get_node` in other nodes when `signal` is emitted
-- [ ] Create proper icons
+- [x] Create proper icons
 - [ ] Add up arrow (full D-pad) so menus can be used
 
 ## Notes:
