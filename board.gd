@@ -17,26 +17,41 @@ const COLUMNS = 10
 const ROWS = 24
 const STAGING = 4
 const VISIBLE_ROWS = ROWS - STAGING
-const BLOCK_SIZE = 30
-const GRID_WIDTH = 1
-const START_X = 10
-const START_Y = (4 * - BLOCK_SIZE) + 70  # move the board up as staging area isn't rendrerd
 const GRID_BG = "#000000"
 const GRID_COLOUR = "#FFFFFF"
 
+# the layout is designed at this size (in 'design pixels') and then scaled to
+# fit the screen, see _update_layout()
+const DESIGN_WIDTH = 412
+const DESIGN_HEIGHT = 914
+const DESIGN_BLOCK_SIZE = 30
+
+# layout sizes in real screen pixels, all whole numbers so every block and
+# line is drawn exactly the same width. Set in _update_layout()
+var layout_scale = 1.0
+var BLOCK_SIZE = DESIGN_BLOCK_SIZE
+var GRID_WIDTH = 1
+var START_X = 10
+var START_Y = 0
+var FONT_SIZE = 14
+
 # score, level and lines extra boxes
-const GAP = 5
-const NEXT_SHAPE_X = (COLUMNS * BLOCK_SIZE) + START_X + GAP
-const NEXT_SHAPE_Y = START_Y + (BLOCK_SIZE * STAGING)
+var GAP = 5
+var NEXT_SHAPE_X = 0
+var NEXT_SHAPE_Y = 0
 
-const SCORE_BOX_X = NEXT_SHAPE_X
-const SCORE_BOX_Y = NEXT_SHAPE_Y + GAP + (5 * BLOCK_SIZE)
+var SCORE_BOX_X = 0
+var SCORE_BOX_Y = 0
 
-const LEVEL_BOX_X = NEXT_SHAPE_X
-const LEVEL_BOX_Y = SCORE_BOX_Y + GAP + (2 * BLOCK_SIZE)
+var LEVEL_BOX_X = 0
+var LEVEL_BOX_Y = 0
 
-const LINES_BOX_X = NEXT_SHAPE_X
-const LINES_BOX_Y = LEVEL_BOX_Y + GAP + (2 * BLOCK_SIZE)
+var LINES_BOX_X = 0
+var LINES_BOX_Y = 0
+
+# block bevel sizes
+var border_width = 1
+var step_down = 4
 
 # points for placing shape and clearing a line & 5 line in one go bonus
 var score = 0
@@ -100,8 +115,54 @@ var intro_old_state = false
 func _ready():
 	print("COL: ", + COLUMNS)
 	print("ROW: ", + ROWS)
+	get_viewport().size_changed.connect(_update_layout)
+	_update_layout()
 	board_ready.emit()
 	pass
+
+
+# convert a size in design pixels to whole screen pixels
+func _px(value):
+	return roundi(value * layout_scale)
+
+
+# work out the biggest whole-pixel block size that fits the screen, then
+# scale everything else from that, rounding each size to whole pixels so
+# nothing ends up 2px in one place and 3px in another
+func _update_layout():
+	var screen = get_viewport_rect().size
+	var fit_scale = min(screen.x / DESIGN_WIDTH, screen.y / DESIGN_HEIGHT)
+	BLOCK_SIZE = max(1, floori(DESIGN_BLOCK_SIZE * fit_scale))
+	layout_scale = float(BLOCK_SIZE) / DESIGN_BLOCK_SIZE
+
+	GRID_WIDTH = max(1, _px(1))
+	border_width = max(1, _px(1))
+	step_down = _px(4)
+	FONT_SIZE = _px(14)
+	GAP = _px(5)
+	START_X = _px(10)
+	START_Y = (4 * - BLOCK_SIZE) + _px(70)  # move the board up as staging area isn't rendrerd
+
+	NEXT_SHAPE_X = (COLUMNS * BLOCK_SIZE) + START_X + GAP
+	NEXT_SHAPE_Y = START_Y + (BLOCK_SIZE * STAGING)
+
+	SCORE_BOX_X = NEXT_SHAPE_X
+	SCORE_BOX_Y = NEXT_SHAPE_Y + GAP + (5 * BLOCK_SIZE)
+
+	LEVEL_BOX_X = NEXT_SHAPE_X
+	LEVEL_BOX_Y = SCORE_BOX_Y + GAP + (2 * BLOCK_SIZE)
+
+	LINES_BOX_X = NEXT_SHAPE_X
+	LINES_BOX_Y = LEVEL_BOX_Y + GAP + (2 * BLOCK_SIZE)
+
+	# centre the design area on the screen, on a whole pixel
+	var offset = Vector2(roundi((screen.x - DESIGN_WIDTH * layout_scale) / 2), roundi((screen.y - DESIGN_HEIGHT * layout_scale) / 2))
+	position = offset
+	# the touch buttons are textures so just scale their layer to match
+	var controls = get_node("../controls")
+	controls.offset = offset
+	controls.scale = Vector2(layout_scale, layout_scale)
+	queue_redraw()
 
 func game_over():
 	await get_tree().create_timer(2.0).timeout
@@ -325,10 +386,8 @@ func _draw():
 			for i in range(START_Y + (BLOCK_SIZE * STAGING), BLOCK_SIZE * ROWS + START_Y + 1, BLOCK_SIZE):
 				draw_line( Vector2(START_X, i), Vector2(COLUMNS * BLOCK_SIZE + START_X, i ), GRID_COLOUR, GRID_WIDTH)
 		
-		const border_width = 1
-		const step_down = 4
-		const step_down_2 = step_down * 2
-		const step_down_3 = step_down_2 * 2
+		var step_down_2 = step_down * 2
+		var step_down_3 = step_down_2 * 2
 			
 		# fill any squares in the board that != 0
 		for row in range(STAGING, ROWS):
@@ -345,7 +404,7 @@ func _draw():
 					var rect_2 = Rect2(x + step_down, y + step_down, width - (step_down * 2) - border_width, height - (step_down * 2) - border_width)
 					var rect_3 = Rect2(x + step_down_2, y + step_down_2, width - (step_down_2 * 2) - border_width, height - (step_down_2 * 2) - border_width)
 					var rect_4 = Rect2(x + step_down_3, y + step_down_3, width - (step_down_3 * 2) - border_width, height - (step_down_3 * 2) - border_width)
-					draw_rect(rect_0, _colour.lightened(0.4), false, 1)
+					draw_rect(rect_0, _colour.lightened(0.4), false, border_width)
 					draw_rect(rect_1, _colour.darkened(0.2)) # darker
 					draw_rect(rect_2, _colour.lightened(0.2)) # darker
 					draw_rect(rect_3, _colour.darkened(0.2)) # darker
@@ -370,22 +429,22 @@ func _draw():
 		draw_rect(Rect2(LINES_BOX_X, LINES_BOX_Y, 3 * BLOCK_SIZE, 2 * BLOCK_SIZE), GRID_COLOUR, false, GRID_WIDTH)
 		
 		# draw the Score text
-		draw_string(default_font, Vector2(SCORE_BOX_X + 5, SCORE_BOX_Y + 25), "SCORE:", HORIZONTAL_ALIGNMENT_LEFT, -1, 14)
-		draw_string(default_font, Vector2(SCORE_BOX_X + 5, SCORE_BOX_Y + 45), "%010d" % score, HORIZONTAL_ALIGNMENT_LEFT, -1, 14)
+		draw_string(default_font, Vector2(SCORE_BOX_X + _px(5), SCORE_BOX_Y + _px(25)), "SCORE:", HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE)
+		draw_string(default_font, Vector2(SCORE_BOX_X + _px(5), SCORE_BOX_Y + _px(45)), "%010d" % score, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE)
 		
 		# draw the level text
-		draw_string(default_font, Vector2(LEVEL_BOX_X + 5, LEVEL_BOX_Y + 25), "LEVEL:", HORIZONTAL_ALIGNMENT_LEFT, -1, 14)
-		draw_string(default_font, Vector2(LEVEL_BOX_X + (1.5 * BLOCK_SIZE), LEVEL_BOX_Y + 45), str(level), HORIZONTAL_ALIGNMENT_LEFT, -1, 14)
+		draw_string(default_font, Vector2(LEVEL_BOX_X + _px(5), LEVEL_BOX_Y + _px(25)), "LEVEL:", HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE)
+		draw_string(default_font, Vector2(LEVEL_BOX_X + (1.5 * BLOCK_SIZE), LEVEL_BOX_Y + _px(45)), str(level), HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE)
 		
-		draw_string(default_font, Vector2(LINES_BOX_X + 5, LINES_BOX_Y + 25), "LINES:", HORIZONTAL_ALIGNMENT_LEFT, -1, 14)
-		draw_string(default_font, Vector2(LINES_BOX_X + (1.5 * BLOCK_SIZE), LINES_BOX_Y + 45), str(lines_complete), HORIZONTAL_ALIGNMENT_LEFT, -1, 14)
+		draw_string(default_font, Vector2(LINES_BOX_X + _px(5), LINES_BOX_Y + _px(25)), "LINES:", HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE)
+		draw_string(default_font, Vector2(LINES_BOX_X + (1.5 * BLOCK_SIZE), LINES_BOX_Y + _px(45)), str(lines_complete), HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE)
 		
 		# draw the board outline last
 		draw_rect( Rect2(START_X, START_Y + (BLOCK_SIZE * STAGING), COLUMNS * BLOCK_SIZE, VISIBLE_ROWS * BLOCK_SIZE), GRID_COLOUR, false, GRID_WIDTH)
 		
 		# draw the game over text
 		if game_state == 2:
-			draw_string(default_font, Vector2(LINES_BOX_X + 2.5, LINES_BOX_Y + 85), "GAME OVER!", HORIZONTAL_ALIGNMENT_CENTER, -1, 14)
+			draw_string(default_font, Vector2(LINES_BOX_X + _px(2.5), LINES_BOX_Y + _px(85)), "GAME OVER!", HORIZONTAL_ALIGNMENT_CENTER, -1, FONT_SIZE)
 	
 		# draw the next shape in the box
 		var _next_shape = _get_next_shape_matrix(next_shape)
@@ -408,7 +467,7 @@ func _draw():
 					var rect_2 = Rect2(x + step_down, y + step_down, width - (step_down * 2) - border_width, height - (step_down * 2) - border_width)
 					var rect_3 = Rect2(x + step_down_2, y + step_down_2, width - (step_down_2 * 2) - border_width, height - (step_down_2 * 2) - border_width)
 					var rect_4 = Rect2(x + step_down_3, y + step_down_3, width - (step_down_3 * 2) - border_width, height - (step_down_3 * 2) - border_width)
-					draw_rect(rect_0, _colour.lightened(0.4), false, 1)
+					draw_rect(rect_0, _colour.lightened(0.4), false, border_width)
 					draw_rect(rect_1, _colour.darkened(0.2)) # darker
 					draw_rect(rect_2, _colour.lightened(0.2)) # lighter
 					draw_rect(rect_3, _colour.darkened(0.2)) # darker

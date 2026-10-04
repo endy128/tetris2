@@ -15,9 +15,6 @@ size = Vector2(350, 100)
 
 [node name="main" type="Node2D"]
 
-[node name="Camera2D" type="Camera2D" parent="."]
-position = Vector2(206, 457)
-
 [node name="board" type="Node2D" parent="."]
 script = ExtResource("1_qqn35")
 
