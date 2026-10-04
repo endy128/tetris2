@@ -111,6 +111,8 @@ func game_over():
 
 func reset_game():
 	# set up empty board, 1st four rows are NOT rendered
+	# start from a fresh array, otherwise a restart appends onto the old board
+	board = []
 	for row in range(ROWS):
 		board.append([])
 		for col in range(COLUMNS):
@@ -121,7 +123,14 @@ func reset_game():
 	level = 0 
 	lines_complete = 0
 	score = 0
-	
+	# clear any line flashing / held button state left over from the last game
+	is_flashing = false
+	flash_type = false
+	flashes_done = 0
+	lines = false
+	movement = 0
+	btn_repeat_time = 0
+
 
 func _level_up():
 	print("LEVEL UP!!")

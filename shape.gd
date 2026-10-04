@@ -31,8 +31,9 @@ func move(direction):
 		for row in range(0, len(snapshot)):
 			for col in range(0, len(snapshot[row])):
 				if snapshot[row][col] + self.frames[self.frame_index][row][col] > 2:
-					return 
+					return
 		position.x += direction
+		_update_coords()
 	else:
 		return
 
@@ -73,10 +74,21 @@ func _print_array(arr):
 
 func rotate(direction):
 	if _check_if_can_rotate(direction):
-		self.frame_index += direction
-		self.frame_index %= len(self.frames)
-	else: 
+		self.frame_index = posmod(self.frame_index + direction, len(self.frames))
+		_update_coords()
+	else:
 		return
+
+
+# recalculate coords straight after a move/rotate, so the collision check
+# on the next drop isn't using where the shape was before it moved
+func _update_coords():
+	coords = []
+	var frame = self.frames[self.frame_index]
+	for row in len(frame):
+		for col in len(frame[row]):
+			if frame[row][col] == 1:
+				coords.push_back({'x': position.x + col, 'y': position.y + row})
 
 
 func _check_if_can_drop():
@@ -105,9 +117,13 @@ func _get_shape_height():
 
 func _check_if_can_rotate(direction):
 	# returns false if the shape rotates and pushes it off the board
-	var _frame_index = (self.frame_index + direction) % len(self.frames)
-	var _frame_cols = len(self.frames[_frame_index][0])
-	if (position.x + _frame_cols) > _COLUMNS:
+	# (side or bottom) or into blocks that have already been set
+	var _frame_index = posmod(self.frame_index + direction, len(self.frames))
+	var _frame = self.frames[_frame_index]
+	if (position.x + len(_frame[0])) > _COLUMNS or (position.y + len(_frame)) > _ROWS:
 		return false
-	else:
-		return true
+	for row in len(_frame):
+		for col in len(_frame[row]):
+			if _frame[row][col] == 1 and my_board[position.y + row][position.x + col]['value'] == 2:
+				return false
+	return true
